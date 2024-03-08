@@ -19,8 +19,12 @@ class ThumbImage
 	// Method to create the picture thumbnail.
     public function createThumb($destImagePath, $thumbWidth=100)
     {		
-		$thumb = new Imagick($this->source);
-		$thumb->resizeImage($thumbWidth, $thumbHeight, Imagick::FILTER_LANCZOS,1);
-		$thumb->writeImage($destImagePath);
+		try{
+			$thumb = new Imagick($this->source);
+			$thumb->resizeImage($thumbWidth, $thumbHeight, Imagick::FILTER_LANCZOS,1);
+			$thumb->writeImage($destImagePath);
+		}catch(Exception $e){
+			
+		}
     }
 }
