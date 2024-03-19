@@ -59,7 +59,7 @@ function getThumbnail($artist){
 			// Get the extension of the file.
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
 			
-			if(!empty($extension)){
+			if(!empty($extension) && $extension !== "db"){
 				// File has extension, it has a thumbnail.
 				$thumbnail = "thumbs/".$artist."/".$file;
 				
