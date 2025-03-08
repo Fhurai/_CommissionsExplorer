@@ -1,40 +1,9 @@
+.vscode
 
-#Ignore thumbnails created by Windows
-Thumbs.db
-#Ignore files built by Visual Studio
-*.obj
-*.exe
-*.pdb
-*.user
-*.aps
-*.pch
-*.vspscc
-*_i.c
-*_p.c
-*.ncb
-*.suo
-*.tlb
-*.tlh
-*.bak
-*.cache
-*.ilk
-*.log
-[Bb]in
-[Dd]ebug*/
-*.lib
-*.sbr
-obj/
-[Rr]elease*/
-_ReSharper*/
-[Tt]est[Rr]esult*
-.vs/
-#Nuget packages folder
-packages/
+# Ignore all files in 'commissions' except 'dummy.txt'
+commissions/*
+!commissions/dummy.txt
 
-Commissions/*
+# Ignore all files in 'thumbs' except 'dummy.txt'
 thumbs/*
-php/admin.json
-php/nsfw.json
-php/sfw.json
-php/twitter.json
-plan.txt
+!thumbs/dummy.txt
