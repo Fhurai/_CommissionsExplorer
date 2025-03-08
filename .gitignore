@@ -1,0 +1,9 @@
+.vscode
+
+# Ignore all files in 'commissions' except 'dummy.txt'
+commissions/*
+!commissions/dummy.txt
+
+# Ignore all files in 'thumbs' except 'dummy.txt'
+thumbs/*
+!thumbs/dummy.txt
