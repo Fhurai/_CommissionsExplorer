@@ -6,10 +6,18 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once "./utilitaires.php";
 
-$api = json_decode(file_get_contents("sfw.json"), true);
+$artists = json_decode(file_get_contents("sfw.json"), true);
 
-$api = array_filter($api, function($artist): bool{
+$artists = array_filter($artists, function($artist): bool{
     return $artist === (!getQueryParameter("isNsfw") || getQueryParameter("isNsfw") !== "true");
 });
 
-echo json_encode($api);
+foreach($artists as $artist => $sfw){
+    $folder = explorePath("../thumbs/".$artist);
+    sort($folder);
+    $artists[$artist] = array_key_exists(0, $folder) ? $folder[0] : "./assets/img/folder.png";
+}
+
+ksort($artists, SORT_NATURAL | SORT_FLAG_CASE);
+
+echo json_encode($artists);
