@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Métadonnées SEO -->
-    <meta name="description" content="ComEx - Plateforme de découverte et d'exploration de contenu multimédia">
+    <meta name="description" content="ComEx - Plateforme de découverte et d'exploration de commissions">
     
     <!-- Titre de la page -->
     <title>Welcome | ComEx</title>
@@ -26,6 +26,9 @@
     <!-- En-tête principal -->
     <header>
         <h1>ComEx</h1>
+        <span>
+            <button id="returnButton">Return</button>
+        </span>
     </header>
 
     <!-- Contenu principal -->
@@ -44,11 +47,11 @@
 
             <!-- Barre de recherche et résultats -->
             <div>
-                <span>
-                    <input id="search" name="search" type="text" placeholder="Search..."/>
+            	<span>
+                    <div id="results" name="results"></div>
                 </span>
                 <span>
-                    <div id="results" name="results"></div>
+                    <input id="search" name="search" type="text" placeholder="Search..."/>
                 </span>
                 <span>
                     <ul id="suggestions"></ul>
@@ -61,7 +64,7 @@
 
         <!-- Indicateur de chargement -->
         <div id="spinner" class="spinner">
-            <div id="spinnerLoad" class="loading-text">Loading ...</div>
+            <div id="spinnerLoad" class="loading-text" hidden>Loading ...</div>
             <div id="spinnerNumber" class="loading-text"></div>
         </div>
     </main>

@@ -96,12 +96,21 @@ function getFullPaths(string $artwork): array{
     if(!file_exists("../".$commPath)){
         throw new Exception("Artwork link not found:".$commPath);
     }
+    
+    $dirPath = "";
+    $words = explode("/", "../".$thumbPath);
+    foreach($words as $key => $word){
+    	$dirPath .= $word . ($key < count($words) -1 ? "/" : "");
+    	if(!is_dir($temp) && $key < count($words) -1){
+    		mkdir($dirPath, 0755, false);
+    	};
+    }
 
     if(!file_exists("../".$thumbPath)){
         $temp = explode("/", $thumbPath);
         unset($temp[count($temp) - 1]);
         $temp = "../".implode("/", $temp);
-        if(!file_exists($temp)) mkdir($temp, 0755, false);
+        if(!is_dir($temp)) mkdir($temp, 0777, false);
 
         $objThumbImage = new ThumbImage("../".$commPath);
 		$objThumbImage->createThumb("../".$thumbPath, 250);
