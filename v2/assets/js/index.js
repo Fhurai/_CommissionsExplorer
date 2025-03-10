@@ -72,7 +72,7 @@ function InputSearchField() {
 }
 
 function KeyDownSearchField() {
-    document
+  document
     .querySelector("#search")
     .removeEventListener("keydown", navigateSuggestions);
   document
@@ -86,14 +86,19 @@ function KeyDownSearchField() {
  */
 function clickSuggestion() {
   document.querySelectorAll("nav span ul li").forEach((btn) => {
-    btn.addEventListener("click", function (e) {
-      const searchField = document.querySelector("#search");
-      searchField.value = e.currentTarget.innerText;
-      emptySuggestions();
-      showUniqueSuggestion();
-      searchField.value = ""; // Immediate clearance might be unintended
-    });
+    btn.removeEventListener("click", GoToSuggestion);
   });
+  document.querySelectorAll("nav span ul li").forEach((btn) => {
+    btn.addEventListener("click", GoToSuggestion);
+  });
+}
+
+function GoToSuggestion(e) {
+  const searchField = document.querySelector("#search");
+  searchField.value = e.currentTarget.innerText;
+  emptySuggestions();
+  showUniqueSuggestion();
+  searchField.value = ""; // Immediate clearance might be unintended
 }
 
 function clickCards() {
@@ -269,8 +274,9 @@ function loadArtworks(artist) {
     .then((artworks) => {
       // Return the Promise.all to chain it
       arts = artworks;
+      document.getElementById("gallery").dataset.artworks = arts.length;
       return Promise.all(
-        Object.values(artworks).map((artwork) => {
+        Object.values(arts).map((artwork) => {
           return createPreview(artwork);
         })
       );
@@ -363,7 +369,7 @@ async function createPreview(link) {
   const previewDiv = document.createElement("div");
   previewDiv.className = "preview";
   previewDiv.id =
-    link.split("/").pop().replaceAll(" ", "") || Date.now().toString();
+    link.split("/").splice(-2).join("").replaceAll(" ", "") || Date.now().toString();
   previewDiv.append(container);
 
   img.onload = () => {
