@@ -1,49 +1,55 @@
+/* 
+ * index.css - Provides styling for artist gallery interface and components
+ * Implements dark theme, responsive layout, and interactive element states
+ */
+
+/*** Base Variables & Global Styles *******************************************/
+
+/* Theme color definitions */
 :root {
-  --ce-primary-background-color: #0e0e0e;
-  --ce-primary-font-color: #e0e0e0;
-
-  --ce-secondary-background-color: #2d2d2d;
-  --ce-secondary-font-color: #d2d2d2;
-
-  --ce-third-background-color: #4c4c4c;
-  --ce-third-font-color: #c4c4c4;
+  --ce-primary-background-color: #0e0e0e;    /* Main background/darkest shade */
+  --ce-primary-font-color: #e0e0e0;          /* Primary text color */
+  --ce-secondary-background-color: #2d2d2d;  /* Secondary elements/header */
+  --ce-secondary-font-color: #d2d2d2;        /* Secondary text */
+  --ce-third-background-color: #4c4c4c;      /* Card backgrounds */
+  --ce-third-font-color: #c4c4c4;            /* Tertiary text */
 }
 
-html,
-body {
+/* Global page layout */
+html, body {
   background-color: var(--ce-primary-background-color);
   color: var(--ce-primary-font-color);
   padding: 0;
   margin: 0;
-  overflow: hidden;
-  min-width: 250px;
+  overflow: hidden;        /* Prevent default page scrolling */
+  min-width: 250px;        /* Minimum mobile-friendly width */
 }
 
+/*** Overlay Components *******************************************************/
+
+/* Semi-transparent backdrop for modal interactions */
 #backdrop {
   background-color: rgba(0, 0, 0, 0.5);
   width: 100%;
   height: 100%;
-  overflow: hidden;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 7;
-  display: none;
+  z-index: 7;             /* Mid-layer positioning */
+  display: none;          /* Hidden by default */
 }
 
 #backdrop.show {
-  display: block;
+  display: block;         /* Activated via JavaScript */
 }
 
-/**
- * Header
- */
+/*** Header Styles ************************************************************/
 
 header {
   background-color: var(--ce-secondary-background-color);
-  height: 3rem;
+  height: 3rem;           /* Fixed header height */
   border-radius: 0 0 0.5rem 0.5rem;
-  z-index: 10;
+  z-index: 10;            /* Ensure header stays on top */
 }
 
 h1 {
@@ -51,26 +57,50 @@ h1 {
   padding: 0.5rem 0.5rem;
 }
 
-/**
- * Nav
- */
+header > span {
+  padding: 0.5rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 37px;
+    display: flex
+;
+}
+
+header button{
+  background-color: var(--ce-secondary-background-color);
+  border-style: solid;
+  color: var(--ce-third-font-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+header button:hover{
+  background-color: #1f1f1f;
+}
+
+/*** Navigation Components ****************************************************/
+
 nav {
   margin: 0 0.5rem 0.5rem 0.5rem;
   position: relative;
-  z-index: 10;
+  min-height: 27px;
 }
 
 nav > span {
   margin-top: 0.55rem;
   display: inline-block;
+  z-index: 2;
+  position: relative;
 }
 
-nav > span:hover {
+nav > span:hover{
   background-color: #1f1f1f;
 }
 
+/* Custom radio button styling for NSFW/SFW toggle */
 nav > span input[type="radio"]:checked + label {
-  border-color: var(--ce-primary-font-color);
+  border-color: var(--ce-primary-font-color); /* Active state indicator */
 }
 
 nav > span label {
@@ -94,6 +124,11 @@ nav > div {
   background-color: var(--ce-secondary-background-color);
   border: 1px solid var(--ce-primary-background-color);
   border-radius: 0 0 0.5rem 0.5rem;
+  z-index: 10;
+}
+
+nav > div #results{
+	padding: 0 0.5rem;
 }
 
 nav > div:last-child ul {
@@ -117,16 +152,14 @@ nav > div:last-child ul li {
   cursor: pointer;
 }
 
-nav > div:last-child ul li:hover {
+nav > div:last-child ul li:hover, nav > div:last-child ul li.selected {
   background-color: #1f1f1f;
 }
 
-/**
- * Main
- */
+/*** Main Gallery Layout ******************************************************/
 
 main {
-  height: calc(100vh - 3.33rem);
+  height: calc(100vh - 3.33rem); /* Full viewport minus header */
   position: relative;
 }
 
@@ -134,13 +167,12 @@ main > #gallery {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-evenly;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(100vh - 3.33rem);
   margin-top: -2rem;
   z-index: 1;
   position: relative;
-  z-index: 5;
 }
 
 main > #gallery .push{
@@ -149,7 +181,8 @@ main > #gallery .push{
   width: 100%;
 }
 
-main > #gallery .card {
+main > #gallery .card, 
+main > #gallery .preview {
   text-align: center;
   border-radius: 1rem;
   min-width: 300px;
@@ -157,9 +190,11 @@ main > #gallery .card {
   max-height: 300px;
   margin: 0.5rem auto;
   overflow: hidden;
+  cursor: pointer;
 }
 
-main > #gallery .card .img-div {
+main > #gallery .card .img-div,
+main > #gallery .preview .img-div{
   background-color: var(--ce-third-background-color);
   position: relative;
   overflow: hidden;
@@ -167,33 +202,41 @@ main > #gallery .card .img-div {
   align-content: space-evenly;
 }
 
-main > #gallery .card .img-div img {
+main > #gallery .card .img-div img,
+main > #gallery .preview .img-div img{
   width: 100%;
 }
 
-main > #gallery .card::before {
+main > #gallery .card::before,
+main > #gallery .preview::before{
   content: attr(id);
   display: block;
   padding: 0 0.5rem;
   background: var(--ce-secondary-background-color);
   border-radius: 1rem 1rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-main > #gallery .card.searched {
+main > #gallery .card.searched,
+main > #gallery .preview.searched{
   animation-duration: 0.8s;
   animation-name: flash;
   animation-iteration-count: 10;
   transition: none;
 }
 
-main > #gallery .card span {
+main > #gallery .card span,
+main > #gallery .preview span{
   display: inline-block;
   height: 100%;
   vertical-align: middle;
 }
 
 @media (max-width: 722px) {
-  main > #gallery .card {
+  main > #gallery .card,
+  main > #gallery .preview{
     text-align: center;
     border: 1px solid var(--ce-secondary-background-color);
     border-radius: 1rem;
@@ -205,9 +248,7 @@ main > #gallery .card span {
   }
 }
 
-/**
- * Loading
- */
+/*** Loading Animation ********************************************************/
 
 .centered {
   text-align: center;
@@ -218,6 +259,9 @@ main > #gallery .card span {
   padding: 50px;
   text-align: center;
   z-index: 5;
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 45px);
 }
 
 .spinner.loading {
@@ -247,23 +291,14 @@ main > #gallery .card span {
   animation: rotation 0.7s infinite linear;
 }
 
+/*** Keyframe Animations ******************************************************/
+
 @keyframes rotation {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(359deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(359deg); }
 }
 
 @keyframes flash {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }     /* Create blinking effect */
 }
