@@ -85,25 +85,31 @@ nav {
   margin: 0 0.5rem 0.5rem 0.5rem;
   position: relative;
   min-height: 27px;
+  display: flex;
 }
 
-nav > span {
+nav[hidden] {
+	display: none;	
+}
+
+nav > span, nav > div.content-filters > span{
   margin-top: 0.55rem;
   display: inline-block;
   z-index: 2;
   position: relative;
 }
 
-nav > span:hover{
+nav > span:hover, nav > div.content-filters > span:hover{
   background-color: #1f1f1f;
 }
 
-/* Custom radio button styling for NSFW/SFW toggle */
-nav > span input[type="radio"]:checked + label {
-  border-color: var(--ce-primary-font-color); /* Active state indicator */
+nav > span input[type="radio"]:checked + label,
+nav > div.content-filters > span input[type="radio"]:checked + label{
+  border-color: var(--ce-primary-font-color);
 }
 
-nav > span label {
+nav > span label,
+nav > div.content-filters > span label {
   padding: 0.5rem;
   margin: 0;
   cursor: pointer;
@@ -112,11 +118,12 @@ nav > span label {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-nav > span input {
+nav > span input,
+nav > div.content-filters > span input {
   display: none;
 }
 
-nav > div {
+nav > div.search-bar {
   display: inline-flex;
   position: absolute;
   right: 1rem;
@@ -127,11 +134,11 @@ nav > div {
   z-index: 10;
 }
 
-nav > div #results{
+nav > div.search-bar #results{
 	padding: 0 0.5rem;
 }
 
-nav > div:last-child ul {
+nav > div.search-bar:last-child ul {
   position: absolute;
   right: 0;
   top: 37px;
@@ -145,7 +152,7 @@ nav > div:last-child ul {
   overflow-x: hidden;
 }
 
-nav > div:last-child ul li {
+nav > div.search-bar:last-child ul li {
   background-color: var(--ce-secondary-background-color);
   padding: 1rem 0.5rem;
   border-radius: 0.5rem;
@@ -272,8 +279,10 @@ main > #gallery .preview span{
   width: 90px;
   position: absolute;
   top: calc(50% - 15px);
-  left: calc(50% - 45px);
-  text-align: center;
+  left: calc(50% - 50px);
+  display: inline-flex;
+  justify-content: center;
+  flex-flow: row wrap;
 }
 
 .spinner.loading:before {
@@ -286,7 +295,7 @@ main > #gallery .preview span{
   left: calc(50% - 45px);
   border-width: 8px;
   border-style: solid;
-  border-color: #2180c0 #ccc #ccc;
+  border-color: var(--ce-third-background-color) var(--ce-third-font-color) var(--ce-third-font-color);
   border-radius: 100%;
   animation: rotation 0.7s infinite linear;
 }

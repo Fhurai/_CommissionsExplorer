@@ -1,78 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-<!-- 
-    Page principale de ComEx
-    Auteur : Fhurai
-    Version : 1.0
-    Dernière mise à jour : 09/03/2025
--->
-
+<html lang="en" dir="ltr">
 <head>
-    <!-- Configuration de base -->
+    <!-- Character Encoding -->
     <meta charset="UTF-8">
+    
+    <!-- Responsive Viewport Configuration -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Métadonnées SEO -->
-    <meta name="description" content="ComEx - Plateforme de découverte et d'exploration de commissions">
+    <!-- Primary Meta Information -->
+    <meta name="description" content="ComEx (Commission Explorer) - Accessible platform for commission management">
+    <meta name="theme-color" content="#0e0e0e">
     
-    <!-- Titre de la page -->
-    <title>Welcome | ComEx</title>
+    <!-- Document Title -->
+    <title>ComEx - Commission Explorer Application</title>
     
-    <!-- Feuille de style principale -->
+    <!-- Style Sheets -->
     <link rel="stylesheet" href="./assets/css/index.css">
 </head>
 
-<body>
-    <!-- En-tête principal -->
-    <header>
-        <h1>ComEx</h1>
-        <span>
-            <button id="returnButton">Return</button>
-        </span>
-    </header>
-
-    <!-- Contenu principal -->
-    <main>
-        <!-- Navigation et filtres -->
-        <nav>
-            <!-- Sélection SFW/NSFW -->
-            <span>
-                <input id="sfw" name="nsfw" type="radio" value="false">
-                <label for="sfw">SFW</label>
-            </span>
-            <span>
-                <input id="nsfw" name="nsfw" type="radio" value="true">
-                <label for="nsfw">NSFW</label>
-            </span>
-
-            <!-- Barre de recherche et résultats -->
-            <div>
-            	<span>
-                    <div id="results" name="results"></div>
-                </span>
-                <span>
-                    <input id="search" name="search" type="text" placeholder="Search..."/>
-                </span>
-                <span>
-                    <ul id="suggestions"></ul>
-                </span>
-            </div>
-        </nav>
-
-        <!-- Galerie de contenu (remplie dynamiquement) -->
-        <div id="gallery"></div>
-
-        <!-- Indicateur de chargement -->
-        <div id="spinner" class="spinner">
-            <div id="spinnerLoad" class="loading-text" hidden>Loading ...</div>
-            <div id="spinnerNumber" class="loading-text"></div>
+<body id="root" role="document">    
+    <!-- Fallback Content -->
+    <noscript>
+        <div role="alert" aria-live="polite">
+            <h1>JavaScript Required</h1>
+            <p>This application requires JavaScript to function properly. Please enable JavaScript in your browser settings.</p>
         </div>
-    </main>
-
-    <!-- Fond semi-transparent pour les modales -->
-    <div id="backdrop"></div>
-
-    <!-- Scripts principaux -->
-    <script src="./assets/js/index.js"></script>
+    </noscript>
 </body>
+
+<!-- Application Scripts -->
+<script src="./assets/js/generation.js" defer></script>
+<script src="./assets/js/events.js" defer></script>
+<script src="./assets/js/utilities.js" defer></script>
+
 </html>

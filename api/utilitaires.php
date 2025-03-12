@@ -101,7 +101,7 @@ function getFullPaths(string $artwork): array{
     $words = explode("/", "../".$thumbPath);
     foreach($words as $key => $word){
     	$dirPath .= $word . ($key < count($words) -1 ? "/" : "");
-    	if(!is_dir($temp) && $key < count($words) -1){
+    	if(!is_dir($dirPath) && $key < count($words) -1){
     		mkdir($dirPath, 0755, false);
     	};
     }

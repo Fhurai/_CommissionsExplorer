@@ -13,9 +13,15 @@ $artists = array_filter($artists, function($artist): bool{
 });
 
 foreach($artists as $artist => $sfw){
-    $folder = explorePath("../thumbs/".$artist);
-    sort($folder);
-    $artists[$artist] = array_key_exists(0, $folder) ? $folder[0] : "./assets/img/folder.png";
+    $isDir = is_dir("../thumbs/".$artist);
+    if($isDir){
+        $folder = explorePath("../thumbs/".$artist);
+        sort($folder);
+        $artists[$artist] = array_key_exists(0, $folder) ? $folder[0] : "./assets/img/folder.png";
+    }else{
+        $artists[$artist] = "./assets/img/folder.png";
+    }
+    
 }
 
 ksort($artists, SORT_NATURAL | SORT_FLAG_CASE);
