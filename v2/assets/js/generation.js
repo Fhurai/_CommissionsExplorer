@@ -173,8 +173,7 @@ function generateMain(root) {
   spinnerLoad.className = "loading-text";
   spinnerLoad.setAttribute("role", "status");
   spinnerLoad.setAttribute("aria-live", "polite");
-  spinnerLoad.innerHTML = "Loading...<div id='progressMore'></div>";
-  spinnerLoad.style.top = "calc(-33% - 15px)";
+  spinnerLoad.innerHTML = "Loading<div id='progressMore'></div>";
 
   const spinnerNumber = document.createElement("div");
   spinnerNumber.id = "spinnerNumber";

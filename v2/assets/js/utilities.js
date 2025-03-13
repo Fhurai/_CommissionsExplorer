@@ -194,6 +194,9 @@ async function loadArtworks() {
     })
     .catch((err) => {
       console.error("Failed to update artworks list:", err.message);
+    })
+    .finally(() => {
+    	document.querySelector("#spinnerNumber").innerHTML = "";
     });
 }
 
@@ -210,6 +213,9 @@ function progress(action, artist) {
       const percentage = Math.round(progressValue * 10000) / 100;
 
       if (parseFloat(document.querySelector("#spinnerNumber").innerHTML) === percentage) {
+      	if(document.querySelector("#progressMore").innerText.length === 23){
+      		document.querySelector("#progressMore").innerHTML = "";
+      	}
         document.querySelector("#progressMore").innerHTML += ".";
       } else {
         document.querySelector("#spinnerNumber").innerText = `${percentage}%`;
@@ -219,7 +225,7 @@ function progress(action, artist) {
       console.info(`${artist}: ${percentage}%`);
     })
     .catch((err) =>
-      console.error("Failed to update artworks list:", err.message)
+      console.error("Failed to update progress:", err.message)
     );
 }
 
@@ -230,7 +236,7 @@ async function setThumbnails(artist, artworks) {
   console.info(`${artist}: 0% - Start`);
   let timerId = setInterval(() => {
     progress("thumbnails", artist);
-  }, 500);
+  }, 1000);
 
   try {
     // Retrieve thumbnail URLs for selected artworks
