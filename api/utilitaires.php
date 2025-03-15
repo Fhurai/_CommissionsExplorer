@@ -25,7 +25,7 @@ function getFormParameter(string $arg): mixed {
     return false;
 }
 
-function explorePath(string $path): array{
+function explorePath(string $path, bool $remove = false): array{
     $explored = [];
     $files = array_filter(scandir($path), function($file){
         return $file !== "." && $file !== "..";
@@ -61,7 +61,7 @@ function explorePath(string $path): array{
 
     foreach($files as $key => $file){
         
-        if(in_array($file, $toRemove)){
+        if(in_array($file, $toRemove) && $remove){
             if(is_dir($path."/".$file)){
                 system('rm -rf -- ' . escapeshellarg($path."/".$file), $retval);
             }else{

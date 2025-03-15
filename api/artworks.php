@@ -16,7 +16,7 @@ $artist = getFormParameter("artist");
 $pathCommission = json_decode(file_get_contents("api.json"), true)['commissions'];
 
 if($artist){
-    $folder = explorePath($pathCommission.$artist);
+    $folder = explorePath($pathCommission.$artist, true);
     echo json_encode($folder);
 }else{
     http_response_code(500);
