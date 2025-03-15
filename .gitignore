@@ -7,3 +7,6 @@ commissions/*
 # Ignore all files in 'thumbs' except 'dummy.txt'
 thumbs/*
 !thumbs/dummy.txt
+
+api/api.json
+api/sfw.json
