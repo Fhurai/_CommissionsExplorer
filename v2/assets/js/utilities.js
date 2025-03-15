@@ -196,7 +196,7 @@ async function loadArtworks() {
       console.error("Failed to update artworks list:", err.message);
     })
     .finally(() => {
-    	document.querySelector("#spinnerNumber").innerHTML = "";
+      document.querySelector("#spinnerNumber").innerHTML = "";
     });
 }
 
@@ -212,10 +212,13 @@ function progress(action, artist) {
     .then((progressValue) => {
       const percentage = Math.round(progressValue * 10000) / 100;
 
-      if (parseFloat(document.querySelector("#spinnerNumber").innerHTML) === percentage) {
-      	if(document.querySelector("#progressMore").innerText.length === 23){
-      		document.querySelector("#progressMore").innerHTML = "";
-      	}
+      if (
+        parseFloat(document.querySelector("#spinnerNumber").innerHTML) ===
+        percentage
+      ) {
+        if (document.querySelector("#progressMore").innerText.length === 23) {
+          document.querySelector("#progressMore").innerHTML = "";
+        }
         document.querySelector("#progressMore").innerHTML += ".";
       } else {
         document.querySelector("#spinnerNumber").innerText = `${percentage}%`;
@@ -224,9 +227,7 @@ function progress(action, artist) {
 
       console.info(`${artist}: ${percentage}%`);
     })
-    .catch((err) =>
-      console.error("Failed to update progress:", err.message)
-    );
+    .catch((err) => console.error("Failed to update progress:", err.message));
 }
 
 async function setThumbnails(artist, artworks) {
@@ -263,6 +264,19 @@ async function setThumbnails(artist, artworks) {
     document.querySelector("#spinnerNumber").innerHTML = "100%";
     document.querySelector("#spinner").classList.toggle("loading");
   }
+}
+
+function checkNew() {
+  document.querySelector("#spinner").classList.add("loading");
+  fetch(`${host}new.php`)
+    .then((res) => res.json())
+    .then((artists) => {
+      console.info(artists);
+    })
+    .catch((err) => console.log("Failed to check new artists:", err.message))
+    .finally(() => {
+      document.querySelector("#spinner").classList.remove("loading");
+    });
 }
 
 // *** Show/Hide functions

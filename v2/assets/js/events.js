@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     generateHeader(document.body);
     generateMain(document.body);
     
+    checkNew();
     addNavigateSuccess(loadContent);
     loadContent();
 });

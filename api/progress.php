@@ -12,18 +12,20 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once "./utilitaires.php";
 
+$repositories = json_decode(file_get_contents("api.json"), true);
+
 $action = getFormParameter("action");
 $artist = getFormParameter("artist");
 $progress = 0.0;
 
 switch($action){
     case "thumbnails":
-        $commFolder = explorePath("../commissions/".$artist);
+        $commFolder = explorePath($repositories["commissions"].$artist);
         
-        if(!is_dir("../thumbs/".$artist)){
-            mkdir("../thumbs/".$artist, 0755, true);
+        if(!is_dir($repositories["thumbs"].$artist)){
+            mkdir($repositories["thumbs"].$artist, 0755, true);
         } 
-        $thumbsFolder = explorePath("../thumbs/".$artist);
+        $thumbsFolder = explorePath($repositories["thumbs"].$artist);
         
         $progress = count($thumbsFolder) / count($commFolder);
         break;

@@ -8,14 +8,16 @@ require_once "./utilitaires.php";
 
 $artists = json_decode(file_get_contents("sfw.json"), true);
 
+$repositories = json_decode(file_get_contents("api.json"), true);
+
 $artists = array_filter($artists, function($artist): bool{
     return $artist === (!getQueryParameter("isNsfw") || getQueryParameter("isNsfw") !== "true");
 });
 
 foreach($artists as $artist => $sfw){
-    $isDir = is_dir("../thumbs/".$artist);
+    $isDir = is_dir($repositories["thumbs"].$artist);
     if($isDir){
-        $folder = explorePath("../thumbs/".$artist);
+        $folder = explorePath($repositories["thumbs"].$artist);
         sort($folder);
         $artists[$artist] = array_key_exists(0, $folder) ? $folder[0] : "./assets/img/folder.png";
     }else{
