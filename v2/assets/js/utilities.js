@@ -1,16 +1,23 @@
 /**
- * Capitalizes the first letter of a string and converts the rest to lowercase
+ * Reloads the current page.
+ */
+function reloadPage(){
+  location.reload();
+}
+
+/**
+ * Capitalizes the first letter of a string and converts the rest to lowercase.
  *
- * @param {string} string - The input string to transform
- * @returns {string} The transformed string with first letter capitalized
+ * @param {string} string - The input string to transform.
+ * @returns {string} The transformed string with the first letter capitalized.
  *
  * @example
  * ucFirst('hello');    // Returns 'Hello'
  * ucFirst('HELLO');    // Returns 'Hello'
  * ucFirst('');         // Returns ''
  *
- * @note Handles empty strings gracefully
- * @warning Does not check input type (expects string)
+ * @note Handles empty strings gracefully.
+ * @warning Does not check input type (expects string).
  */
 function ucFirst(string) {
   // Check if the string is empty
@@ -22,9 +29,9 @@ function ucFirst(string) {
 /**
  * Dynamically sets the document title based on URL query parameters.
  *
- * - Uses the "artist" query parameter if present (capitalized via ucFirst())
- * - Defaults to "Welcome | ComEx" when no artist parameter exists
- * - Updates document.title directly
+ * - Uses the "artist" query parameter if present (capitalized via ucFirst()).
+ * - Defaults to "Welcome | ComEx" when no artist parameter exists.
+ * - Updates document.title directly.
  *
  * @function setPageTitle
  * @example

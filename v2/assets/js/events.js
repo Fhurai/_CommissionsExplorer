@@ -4,9 +4,7 @@ const page = "";
 // Global flag for NSFW content filtering
 var isNsfw;
 
-/**
- * 
- */
+
 document.addEventListener("DOMContentLoaded", function () {
     setPageTitle();
     setIsNsfw();
@@ -15,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     checkNew();
     addNavigateSuccess(loadContent);
+    addPopState(reloadPage);
     loadContent();
 });
 
@@ -40,6 +39,34 @@ function addNavigateSuccess(f) {
     
     // Add fresh listener for navigation success events
     window.navigation.addEventListener("navigatesuccess", f);
+}
+
+/**
+ * Safely adds a popstate event listener to the window, ensuring duplicate listeners are removed first.
+ * 
+ * This function guarantees a single instance of the listener function is attached to the window's
+ * popstate event by first removing any existing identical listeners before adding the new one.
+ * 
+ * @param {Function} f - The callback function to execute on popstate events.
+ *                       Receives a PopStateEvent object as parameter.
+ * 
+ * @example
+ * // Add a popstate handler to the window
+ * addPopState((event) => {
+ *   console.log('Popstate event:', event.state);
+ * });
+ * 
+ * @note Important considerations:
+ * - Uses reference-based comparison for listener removal
+ * - Requires same function reference for proper removal
+ * - Preserves other popstate listeners on the window
+ */
+function addPopState(f){
+    // First remove existing listener to prevent duplicate handlers
+    window.removeEventListener("popstate", f);
+
+    // Add fresh listener for popstate events
+    window.addEventListener("popstate", f);
 }
 
 /**
