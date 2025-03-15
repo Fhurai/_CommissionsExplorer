@@ -93,12 +93,12 @@ function generateMain(root) {
   contentFilters.setAttribute("aria-label", "Content filter");
   contentFilters.appendChild(sfwBtn);
   contentFilters.appendChild(nsfwBtn);
-  
+
   reloadFiltersButtons(contentFilters);
 
   // Parse URL parameters
   const searchParams = new URLSearchParams(window.location.search);
-  if(searchParams.size === 0){
+  if (searchParams.size === 0) {
     contentFilters.setAttribute("style", "display:none");
   }
 
@@ -206,8 +206,8 @@ function generateMain(root) {
 
 /**
  */
-function generateCard(artistName, thumb){
-	// Image element setup
+function generateCard(artistName, thumb) {
+  // Image element setup
   const img = document.createElement("img");
   img.src = thumb;
   img.alt = `picture by ${artistName}`;
@@ -253,6 +253,8 @@ function generatePreview(link) {
   const img = document.createElement("img");
   const extension = getExtension(link);
 
+  let addon;
+
   // Configure image based on type
   switch (true) {
     case ["jpg", "jpeg", "png"].includes(extension):
@@ -261,10 +263,20 @@ function generatePreview(link) {
     case ["mp4", "mov", "gif"].includes(extension):
       img.src = "./assets/img/film.png";
       img.style.width = "200px";
+      addon = document.createElement("video");
+      addon.setAttribute("controls", null);
+      addon.preload = "metadata";
+      const source = document.createElement("source");
+      source.type = "video/" + extension;
+      source.src = link;
+      addon.appendChild(source);
       break;
     case ["wav", "mp3"].includes(extension):
       img.src = "./assets/img/music.png";
-      img.style.width = "200px";
+      addon = document.createElement("audio");
+      addon.setAttribute("controls", null);
+      addon.src = link;
+      addon.preload = "metadata";
       break;
     case ["txt", "md"].includes(extension):
       img.src = "./assets/img/file.png";
@@ -281,11 +293,16 @@ function generatePreview(link) {
   container.href = link;
   container.target = "_blank";
   container.append(img);
+  if(addon !== undefined){
+    img.style.display = "none";
+    container.append(addon);
+  }
 
   const previewDiv = document.createElement("div");
   previewDiv.className = "preview";
   previewDiv.id =
-    link.split("/").splice(-2).join("").replaceAll(" ", "") || Date.now().toString();
+    link.split("/").splice(-2).join("").replaceAll(" ", "") ||
+    Date.now().toString();
   previewDiv.append(container);
 
   img.onload = () => {

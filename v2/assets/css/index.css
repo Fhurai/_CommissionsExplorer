@@ -207,10 +207,16 @@ main > #gallery .preview .img-div{
   overflow: hidden;
   height: 100%;
   align-content: space-evenly;
+  display: block;
 }
 
 main > #gallery .card .img-div img,
 main > #gallery .preview .img-div img{
+  width: 100%;
+}
+
+main > #gallery .preview .img-div audio,
+main > #gallery .preview .img-div video{
   width: 100%;
 }
 
