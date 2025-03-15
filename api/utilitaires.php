@@ -35,6 +35,7 @@ function explorePath(string $path, bool $remove = false): array{
     $toRemove = ["desktop.ini", "Thumbs.db", "@eaDir"];
 
     $toIgnore = [
+        // System file format
         'ini', 'db', 'db@SynoEAStream', 
         'png@SynoEAStream', 'psd@SynoEAStream',
         'txt@SynoEAStream',
@@ -42,6 +43,9 @@ function explorePath(string $path, bool $remove = false): array{
         // File edition formats.
         'clip', 'CLIP',
         'psd', 'PSD',
+
+        // Brushes
+        'abr',
         
         // Unknown formats for thumbnails.
         'tif', 'TIF',
@@ -60,7 +64,6 @@ function explorePath(string $path, bool $remove = false): array{
     ];
 
     foreach($files as $key => $file){
-        
         if(in_array($file, $toRemove) && $remove){
             if(is_dir($path."/".$file)){
                 system('rm -rf -- ' . escapeshellarg($path."/".$file), $retval);
@@ -76,7 +79,7 @@ function explorePath(string $path, bool $remove = false): array{
                 }
             }else{
                 unset($files[$key]);
-                $explored = array_merge($explored, explorePath($path . "/" . $file));
+                $explored = array_merge($explored, explorePath($path . "/" . $file, $remove));
             }
         }
     }

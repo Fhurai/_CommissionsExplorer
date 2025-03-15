@@ -170,6 +170,10 @@ function loadArtists() {
       document.querySelector("#spinner").classList.remove("loading");
 
       addInput(document.querySelector("#search"), showSuggestions);
+
+      if(document.querySelector("#search").value !== ""){
+        showUniqueSuggestion();
+      }
     });
 }
 
@@ -201,6 +205,10 @@ async function loadArtworks() {
 }
 
 function progress(action, artist) {
+  if(!document.querySelector("#spinner").classList.contains("loading")){
+    document.querySelector("#spinner").classList.add("loading");
+  }
+
   fetch(`${host}progress.php`, {
     method: "POST", // Required (as per CORS headers)
     headers: {
@@ -232,7 +240,7 @@ function progress(action, artist) {
 
 async function setThumbnails(artist, artworks) {
   document.querySelector("#spinnerNumber").innerText = "0%";
-  document.querySelector("#spinner").classList.toggle("loading");
+  document.querySelector("#spinner").classList.add("loading");
 
   console.info(`${artist}: 0% - Start`);
   let timerId = setInterval(() => {
@@ -262,7 +270,7 @@ async function setThumbnails(artist, artworks) {
     timerId = null;
     console.info(`${artist}: 100% - End`);
     document.querySelector("#spinnerNumber").innerHTML = "100%";
-    document.querySelector("#spinner").classList.toggle("loading");
+    document.querySelector("#spinner").classList.remove("loading");
   }
 }
 
@@ -310,7 +318,7 @@ function showNavBar() {
   }
 }
 
-function showSuggestions() {
+function showSuggestions(event) {
   emptySuggestions();
   let search = event.currentTarget.value;
 
@@ -390,6 +398,7 @@ function goToArtist(event) {
 }
 
 function returnIndex() {
+  const artist = document.title.split("|")[0].trim();
   const state = { data: "optional state object" };
   const title = "Welcome | ComEx";
   const searchParams = new URLSearchParams(window.location.search);
@@ -397,4 +406,5 @@ function returnIndex() {
   const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
   history.pushState(state, title, newUrl);
   setPageTitle();
+  document.querySelector("#search").value = artist;
 }
