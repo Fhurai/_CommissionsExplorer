@@ -1,9 +1,7 @@
+// Define supported file types for pictures, videos, audio, and text
 const pictureTypes = ["jpg", "jpeg", "png", "gif"];
-
 const videoTypes = ["mp4", "mov"];
-
 const audioTypes = ["wav", "mp3"];
-
 const textTypes = ["txt", "md"];
 
 /**
@@ -53,47 +51,15 @@ function generateHeader(root) {
  * @param {HTMLElement} root - The container element to append the main content to
  */
 function generateMain(root) {
-  /**
-   * NSFW/SFW Toggle Section
-   * Radio button group for content filtering
-   */
-  const sfwInput = document.createElement("input");
-  sfwInput.name = "nsfw";
-  sfwInput.id = "sfw";
-  sfwInput.type = "radio";
-  sfwInput.value = "false";
-  sfwInput.setAttribute("aria-checked", "false");
-  sfwInput.setAttribute("role", "radio");
-  sfwInput.setAttribute("tabindex", "0");
+  // NSFW/SFW Toggle Section
+  // Radio button group for content filtering
+  const sfwInput = createRadioInput("sfw", "false");
+  const sfwLabel = createLabel(sfwInput.id);
+  const sfwBtn = createSpan(sfwInput, sfwLabel);
 
-  const sfwLabel = document.createElement("label");
-  sfwLabel.htmlFor = sfwInput.id;
-  sfwLabel.innerText = sfwInput.id.toUpperCase();
-  sfwLabel.setAttribute("aria-hidden", "true");
-
-  const sfwBtn = document.createElement("span");
-  sfwBtn.setAttribute("role", "none");
-  sfwBtn.appendChild(sfwInput);
-  sfwBtn.appendChild(sfwLabel);
-
-  const nsfwInput = document.createElement("input");
-  nsfwInput.name = "nsfw";
-  nsfwInput.id = nsfwInput.name;
-  nsfwInput.type = sfwInput.type;
-  nsfwInput.value = "true";
-  nsfwInput.setAttribute("aria-checked", "false");
-  nsfwInput.setAttribute("role", "radio");
-  nsfwInput.setAttribute("tabindex", "0");
-
-  const nsfwLabel = document.createElement("label");
-  nsfwLabel.htmlFor = nsfwInput.id;
-  nsfwLabel.innerText = nsfwInput.id.toUpperCase();
-  nsfwLabel.setAttribute("aria-hidden", "true");
-
-  const nsfwBtn = document.createElement("span");
-  nsfwBtn.setAttribute("role", "none");
-  nsfwBtn.appendChild(nsfwInput);
-  nsfwBtn.appendChild(nsfwLabel);
+  const nsfwInput = createRadioInput("nsfw", "true");
+  const nsfwLabel = createLabel(nsfwInput.id);
+  const nsfwBtn = createSpan(nsfwInput, nsfwLabel);
 
   const contentFilters = document.createElement("div");
   contentFilters.className = "content-filters";
@@ -102,6 +68,7 @@ function generateMain(root) {
   contentFilters.appendChild(sfwBtn);
   contentFilters.appendChild(nsfwBtn);
 
+  // Reload filter buttons
   reloadFiltersButtons(contentFilters);
 
   // Parse URL parameters
@@ -110,10 +77,8 @@ function generateMain(root) {
     contentFilters.setAttribute("style", "display:none");
   }
 
-  /**
-   * Search Results Counter
-   * Accessible live region for dynamic updates
-   */
+  // Search Results Counter
+  // Accessible live region for dynamic updates
   const count = document.createElement("div");
   count.name = "results";
   count.id = count.name;
@@ -123,10 +88,8 @@ function generateMain(root) {
   const resultsPart = document.createElement("span");
   resultsPart.appendChild(count);
 
-  /**
-   * Search Interface
-   * Accessible search input with suggestions
-   */
+  // Search Interface
+  // Accessible search input with suggestions
   const search = document.createElement("input");
   search.name = "search";
   search.id = search.name;
@@ -154,16 +117,14 @@ function generateMain(root) {
   searchbar.appendChild(inputPart);
   searchbar.appendChild(suggestionsPart);
 
-  /** Main Navigation */
+  // Main Navigation
   const nav = document.createElement("nav");
   nav.setAttribute("aria-label", "Main navigation");
   nav.appendChild(contentFilters);
   nav.appendChild(searchbar);
 
-  /**
-   * Image Gallery Container
-   * Accessible landmark for content
-   */
+  // Image Gallery Container
+  // Accessible landmark for content
   const gallery = document.createElement("div");
   gallery.id = "gallery";
   gallery.setAttribute("role", "region");
@@ -172,10 +133,8 @@ function generateMain(root) {
     gallery.style.marginTop = "0rem";
   }
 
-  /**
-   * Loading Indicators
-   * Accessible status messages
-   */
+  // Loading Indicators
+  // Accessible status messages
   const spinnerLoad = document.createElement("div");
   spinnerLoad.id = "spinnerLoad";
   spinnerLoad.className = "loading-text";
@@ -194,14 +153,14 @@ function generateMain(root) {
   spinnersContainer.appendChild(spinnerLoad);
   spinnersContainer.appendChild(spinnerNumber);
 
-  /** Modal Backdrop */
+  // Modal Backdrop
   const backdrop = document.createElement("div");
   backdrop.id = "backdrop";
   backdrop.setAttribute("role", "dialog");
   backdrop.setAttribute("aria-modal", "true");
   backdrop.setAttribute("aria-hidden", "true");
 
-  /** Main Content Assembly */
+  // Main Content Assembly
   const main = document.createElement("main");
   main.setAttribute("role", "main");
   main.appendChild(nav);
@@ -213,6 +172,10 @@ function generateMain(root) {
 }
 
 /**
+ * Generates a card element for an artist with a thumbnail image
+ * @param {string} artistName - The name of the artist
+ * @param {string} thumb - The URL of the thumbnail image
+ * @returns {HTMLElement} The generated card element
  */
 function generateCard(artistName, thumb) {
   // Image element setup
@@ -246,13 +209,18 @@ function generateCard(artistName, thumb) {
     }
   };
 
+  // Append card to gallery
   document.querySelector("#gallery").appendChild(div);
   return div;
 }
 
 /**
+ * Generates a preview element for a given link
+ * @param {string} link - The URL of the content to preview
+ * @returns {HTMLElement} The generated preview element
  */
 function generatePreview(link) {
+  // Helper function to get the file extension from a link
   const getExtension = (link) => {
     const filename = link.split("/").pop() || "";
     return filename.split(".").pop().toLowerCase();
@@ -301,7 +269,7 @@ function generatePreview(link) {
   container.href = link;
   container.target = "_blank";
   container.append(img);
-  if(addon !== undefined){
+  if (addon !== undefined) {
     img.style.display = "none";
     container.append(addon);
   }
@@ -313,6 +281,7 @@ function generatePreview(link) {
     Date.now().toString();
   previewDiv.append(container);
 
+  // Image load handler for layout adjustments
   img.onload = () => {
     if (img.naturalHeight < 250) {
       Object.assign(img.style, {
@@ -326,6 +295,7 @@ function generatePreview(link) {
     }
   };
 
+  // Remove existing preview if it exists
   if (
     document.getElementById(previewDiv.id) !== null &&
     document.getElementById(previewDiv.id) !== undefined
@@ -335,5 +305,51 @@ function generatePreview(link) {
       .removeChild(document.getElementById(previewDiv.id));
   }
 
+  // Append preview to gallery
   document.querySelector("#gallery").append(previewDiv);
+}
+
+/**
+ * Creates a radio input element with specified id and value
+ * @param {string} id - The id of the input element
+ * @param {string} value - The value of the input element
+ * @returns {HTMLInputElement} The created radio input element
+ */
+function createRadioInput(id, value) {
+  const input = document.createElement("input");
+  input.name = "nsfw";
+  input.id = id;
+  input.type = "radio";
+  input.value = value;
+  input.setAttribute("aria-checked", "false");
+  input.setAttribute("role", "radio");
+  input.setAttribute("tabindex", "0");
+  return input;
+}
+
+/**
+ * Creates a label element for the specified input id
+ * @param {string} inputId - The id of the input element
+ * @returns {HTMLLabelElement} The created label element
+ */
+function createLabel(inputId) {
+  const label = document.createElement("label");
+  label.htmlFor = inputId;
+  label.innerText = inputId.toUpperCase();
+  label.setAttribute("aria-hidden", "true");
+  return label;
+}
+
+/**
+ * Creates a span element containing the specified input and label elements
+ * @param {HTMLInputElement} input - The input element to include in the span
+ * @param {HTMLLabelElement} label - The label element to include in the span
+ * @returns {HTMLSpanElement} The created span element
+ */
+function createSpan(input, label) {
+  const span = document.createElement("span");
+  span.setAttribute("role", "none");
+  span.appendChild(input);
+  span.appendChild(label);
+  return span;
 }

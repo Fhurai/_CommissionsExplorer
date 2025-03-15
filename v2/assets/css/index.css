@@ -45,6 +45,7 @@ html, body {
 
 /*** Header Styles ************************************************************/
 
+/* Header styling */
 header {
   background-color: var(--ce-secondary-background-color);
   height: 3rem;           /* Fixed header height */
@@ -52,22 +53,24 @@ header {
   z-index: 10;            /* Ensure header stays on top */
 }
 
+/* Header title styling */
 h1 {
   margin: 0;
   padding: 0.5rem 0.5rem;
 }
 
+/* Header span styling */
 header > span {
   padding: 0.5rem;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 37px;
-    display: flex
-;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 37px;
+  display: flex;
 }
 
-header button{
+/* Header button styling */
+header button {
   background-color: var(--ce-secondary-background-color);
   border-style: solid;
   color: var(--ce-third-font-color);
@@ -75,12 +78,14 @@ header button{
   cursor: pointer;
 }
 
-header button:hover{
+/* Header button hover effect */
+header button:hover {
   background-color: #1f1f1f;
 }
 
 /*** Navigation Components ****************************************************/
 
+/* Navigation bar styling */
 nav {
   margin: 0 0.5rem 0.5rem 0.5rem;
   position: relative;
@@ -88,26 +93,31 @@ nav {
   display: flex;
 }
 
+/* Hidden navigation bar */
 nav[hidden] {
-	display: none;	
+  display: none;  
 }
 
-nav > span, nav > div.content-filters > span{
+/* Navigation span and content filters styling */
+nav > span, nav > div.content-filters > span {
   margin-top: 0.55rem;
   display: inline-block;
   z-index: 2;
   position: relative;
 }
 
-nav > span:hover, nav > div.content-filters > span:hover{
+/* Navigation span and content filters hover effect */
+nav > span:hover, nav > div.content-filters > span:hover {
   background-color: #1f1f1f;
 }
 
+/* Checked radio button styling */
 nav > span input[type="radio"]:checked + label,
-nav > div.content-filters > span input[type="radio"]:checked + label{
+nav > div.content-filters > span input[type="radio"]:checked + label {
   border-color: var(--ce-primary-font-color);
 }
 
+/* Navigation label styling */
 nav > span label,
 nav > div.content-filters > span label {
   padding: 0.5rem;
@@ -118,11 +128,13 @@ nav > div.content-filters > span label {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
+/* Hide radio button input */
 nav > span input,
 nav > div.content-filters > span input {
   display: none;
 }
 
+/* Search bar styling */
 nav > div.search-bar {
   display: inline-flex;
   position: absolute;
@@ -134,10 +146,12 @@ nav > div.search-bar {
   z-index: 10;
 }
 
-nav > div.search-bar #results{
-	padding: 0 0.5rem;
+/* Search bar results padding */
+nav > div.search-bar #results {
+  padding: 0 0.5rem;
 }
 
+/* Search bar dropdown list styling */
 nav > div.search-bar:last-child ul {
   position: absolute;
   right: 0;
@@ -152,6 +166,7 @@ nav > div.search-bar:last-child ul {
   overflow-x: hidden;
 }
 
+/* Search bar dropdown list item styling */
 nav > div.search-bar:last-child ul li {
   background-color: var(--ce-secondary-background-color);
   padding: 1rem 0.5rem;
@@ -159,17 +174,20 @@ nav > div.search-bar:last-child ul li {
   cursor: pointer;
 }
 
+/* Search bar dropdown list item hover and selected effect */
 nav > div:last-child ul li:hover, nav > div:last-child ul li.selected {
   background-color: #1f1f1f;
 }
 
 /*** Main Gallery Layout ******************************************************/
 
+/* Main content area styling */
 main {
   height: calc(100vh - 3.33rem); /* Full viewport minus header */
   position: relative;
 }
 
+/* Gallery container styling */
 main > #gallery {
   display: flex;
   flex-flow: row wrap;
@@ -182,12 +200,14 @@ main > #gallery {
   position: relative;
 }
 
-main > #gallery .push{
+/* Gallery push element styling */
+main > #gallery .push {
   display: block;
   margin-top: 2.5rem;
   width: 100%;
 }
 
+/* Gallery card and preview styling */
 main > #gallery .card, 
 main > #gallery .preview {
   text-align: center;
@@ -200,8 +220,9 @@ main > #gallery .preview {
   cursor: pointer;
 }
 
+/* Gallery image container styling */
 main > #gallery .card .img-div,
-main > #gallery .preview .img-div{
+main > #gallery .preview .img-div {
   background-color: var(--ce-third-background-color);
   position: relative;
   overflow: hidden;
@@ -210,18 +231,21 @@ main > #gallery .preview .img-div{
   display: block;
 }
 
+/* Gallery image styling */
 main > #gallery .card .img-div img,
-main > #gallery .preview .img-div img{
+main > #gallery .preview .img-div img {
   width: 100%;
 }
 
+/* Gallery audio and video styling */
 main > #gallery .preview .img-div audio,
-main > #gallery .preview .img-div video{
+main > #gallery .preview .img-div video {
   width: 100%;
 }
 
+/* Gallery card and preview before pseudo-element styling */
 main > #gallery .card::before,
-main > #gallery .preview::before{
+main > #gallery .preview::before {
   content: attr(id);
   display: block;
   padding: 0 0.5rem;
@@ -232,24 +256,27 @@ main > #gallery .preview::before{
   white-space: nowrap;
 }
 
+/* Gallery card and preview searched animation */
 main > #gallery .card.searched,
-main > #gallery .preview.searched{
+main > #gallery .preview.searched {
   animation-duration: 0.8s;
   animation-name: flash;
   animation-iteration-count: 10;
   transition: none;
 }
 
+/* Gallery card and preview span styling */
 main > #gallery .card span,
-main > #gallery .preview span{
+main > #gallery .preview span {
   display: inline-block;
   height: 100%;
   vertical-align: middle;
 }
 
+/* Responsive styling for smaller screens */
 @media (max-width: 722px) {
   main > #gallery .card,
-  main > #gallery .preview{
+  main > #gallery .preview {
     text-align: center;
     border: 1px solid var(--ce-secondary-background-color);
     border-radius: 1rem;
@@ -263,10 +290,12 @@ main > #gallery .preview span{
 
 /*** Loading Animation ********************************************************/
 
+/* Centered text alignment */
 .centered {
   text-align: center;
 }
 
+/* Spinner styling */
 .spinner {
   display: none;
   padding: 50px;
@@ -277,10 +306,12 @@ main > #gallery .preview span{
   left: calc(50% - 45px);
 }
 
+/* Spinner loading state */
 .spinner.loading {
   display: block;
 }
 
+/* Spinner number styling */
 #spinnerNumber {
   width: 90px;
   position: absolute;
@@ -291,19 +322,22 @@ main > #gallery .preview span{
   flex-flow: row wrap;
 }
 
-#spinnerLoad{
-	top: calc(-33% - 15px);
-    left: calc(50% - 45px);
-    position: absolute;
-    display: flex;
+/* Spinner load styling */
+#spinnerLoad {
+  top: calc(-33% - 15px);
+  left: calc(50% - 45px);
+  position: absolute;
+  display: flex;
 }
 
-#spinnerLoad #progressMore{
-	display: flex;
-    flex-flow: row wrap;
-    width: 90px;
+/* Spinner progress more styling */
+#spinnerLoad #progressMore {
+  display: flex;
+  flex-flow: row wrap;
+  width: 90px;
 }
 
+/* Spinner loading animation */
 .spinner.loading:before {
   content: "";
   height: 90px;
@@ -321,11 +355,13 @@ main > #gallery .preview span{
 
 /*** Keyframe Animations ******************************************************/
 
+/* Rotation animation */
 @keyframes rotation {
   from { transform: rotate(0deg); }
   to { transform: rotate(359deg); }
 }
 
+/* Flash animation */
 @keyframes flash {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }     /* Create blinking effect */
