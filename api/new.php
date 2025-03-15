@@ -19,7 +19,7 @@ foreach($repository as $artist){
     }
 }
 
-ksort($json);
+ksort($json, SORT_NATURAL | SORT_FLAG_CASE);
 file_put_contents("sfw.json", json_encode($json));
 
 echo json_encode($news);

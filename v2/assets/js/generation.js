@@ -1,3 +1,11 @@
+const pictureTypes = ["jpg", "jpeg", "png", "gif"];
+
+const videoTypes = ["mp4", "mov"];
+
+const audioTypes = ["wav", "mp3"];
+
+const textTypes = ["txt", "md"];
+
 /**
  * Generates the header content structure with enhanced accessibility features
  * @param {HTMLElement} root - The container element to append the main content to
@@ -257,10 +265,10 @@ function generatePreview(link) {
 
   // Configure image based on type
   switch (true) {
-    case ["jpg", "jpeg", "png"].includes(extension):
+    case pictureTypes.includes(extension):
       img.src = link.replace("/commissions/", "/thumbs/");
       break;
-    case ["mp4", "mov", "gif"].includes(extension):
+    case videoTypes.includes(extension):
       img.src = "./assets/img/film.png";
       img.style.width = "200px";
       addon = document.createElement("video");
@@ -271,14 +279,14 @@ function generatePreview(link) {
       source.src = link;
       addon.appendChild(source);
       break;
-    case ["wav", "mp3"].includes(extension):
+    case audioTypes.includes(extension):
       img.src = "./assets/img/music.png";
       addon = document.createElement("audio");
       addon.setAttribute("controls", null);
       addon.src = link;
       addon.preload = "metadata";
       break;
-    case ["txt", "md"].includes(extension):
+    case textTypes.includes(extension):
       img.src = "./assets/img/file.png";
       img.style.width = "200px";
       break;

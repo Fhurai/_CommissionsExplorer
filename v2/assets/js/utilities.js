@@ -271,7 +271,7 @@ function checkNew() {
   fetch(`${host}new.php`)
     .then((res) => res.json())
     .then((artists) => {
-      console.info(artists);
+      if(artists.length > 0) console.info(artists);
     })
     .catch((err) => console.log("Failed to check new artists:", err.message))
     .finally(() => {
