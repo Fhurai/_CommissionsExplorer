@@ -133,7 +133,7 @@ function getFullPaths(string $artwork): array {
     ini_set('log_errors', 1);
     ini_set('error_log', '/path/to/custom.log');
 
-    $host = "http://naslku.synology.me/Commissions/";
+    $host = "../";
     $commPath = $artwork;
     $thumbPath = str_replace("commissions/", "thumbs/", $artwork);
 
@@ -162,8 +162,8 @@ function getFullPaths(string $artwork): array {
         if (!is_dir($temp)) mkdir($temp, 0777, false);
 
         // Create the thumbnail image
-        $objThumbImage = new ThumbImage("../" . $commPath);
-        $objThumbImage->createThumb("../" . $thumbPath, 250);
+        $objThumbImage = new ThumbImage($host . $commPath);
+        $objThumbImage->createThumb($host . $thumbPath, 250);
     }
 
     return [$host . $commPath, $host . $thumbPath];

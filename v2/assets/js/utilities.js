@@ -222,7 +222,7 @@ function loadArtists() {
 
       // Show unique suggestion if the search field is not empty
       if (document.querySelector("#search").value !== "") {
-        showUniqueSuggestion();
+        setTimeout(showUniqueSuggestion, 500);
       }
     });
 }
@@ -444,9 +444,10 @@ function showSuggestions(event) {
  * Shows the unique suggestion based on the current search input value.
  */
 function showUniqueSuggestion() {
+  const searchTerm = document.querySelector("#search").value.trim();
+  
   Array.from(document.querySelectorAll(".card")).forEach((card) => {
-    const searchTerm = document.querySelector("#search").value.trim();
-    if (card.id.toLowerCase().startsWith(searchTerm.toLowerCase())) {
+    if (card.id.toLowerCase() === searchTerm.toLowerCase()) {
       // Highlight and scroll to the matching card
       card.classList.add("searched");
       setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "nearest" }), 10);

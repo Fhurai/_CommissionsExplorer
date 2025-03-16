@@ -1,6 +1,6 @@
 // Define supported file types for pictures, videos, audio, and text
 const pictureTypes = ["jpg", "jpeg", "png", "gif"];
-const videoTypes = ["mp4", "mov"];
+const videoTypes = ["mp4", "mov", "avi"];
 const audioTypes = ["wav", "mp3"];
 const textTypes = ["txt", "md"];
 

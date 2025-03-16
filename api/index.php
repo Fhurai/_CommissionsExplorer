@@ -43,8 +43,7 @@
         </ul>
     </main>
     <footer>
-        <!-- Footer section -->
-        ...existing code...
+        
     </footer>
 </body>
 </html>
