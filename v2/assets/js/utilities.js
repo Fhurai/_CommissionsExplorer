@@ -20,10 +20,8 @@ function reloadPage(){
  * @warning Does not check input type (expects string).
  */
 function ucFirst(string) {
-  // Check if the string is empty
-  if (string.length === 0) return "";
-  // Capitalize the first letter and convert the rest to lowercase
-  return string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase();
+  if (!string) return "";
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
 /**
@@ -39,19 +37,9 @@ function ucFirst(string) {
  * // Sets document.title to "Picasso | ComEx"
  */
 function setPageTitle() {
-  let title = "";
   const searchParams = new URLSearchParams(window.location.search);
-
-  // Check if the "artist" query parameter is present
-  if (searchParams.get("artist") === null) {
-    title = "Welcome | ComEx";
-  } else {
-    // Capitalize the artist name and set the title
-    title = ucFirst(searchParams.get("artist")) + " | ComEx";
-  }
-
-  // Update the document title
-  document.title = title;
+  const artist = searchParams.get("artist");
+  document.title = artist ? `${ucFirst(artist)} | ComEx` : "Welcome | ComEx";
 }
 
 /**
@@ -60,7 +48,6 @@ function setPageTitle() {
  * @returns {boolean} True if the current page is the welcome page, false otherwise.
  */
 function isWelcomePage() {
-  // Compare the document title to the welcome page title
   return document.title === "Welcome | ComEx";
 }
 
@@ -69,7 +56,6 @@ function isWelcomePage() {
  */
 function setIsNsfw() {
   const searchParams = new URLSearchParams(window.location.search);
-  // Set the NSFW flag based on the "isNsfw" query parameter and if it's the welcome page
   isNsfw = isWelcomePage() && searchParams.get("isNsfw") === "true";
 }
 
@@ -77,13 +63,10 @@ function setIsNsfw() {
  * Empties the suggestions list and hides related UI elements.
  */
 function emptySuggestions() {
-  // Clear the suggestions list
-  document.querySelector("#suggestions").innerHTML = "";
-  // Hide the suggestions list
-  document.querySelector("#suggestions").classList.remove("show");
-  // Hide the backdrop
+  const suggestions = document.querySelector("#suggestions");
+  suggestions.innerHTML = "";
+  suggestions.classList.remove("show");
   document.querySelector("#backdrop").classList = "";
-  // Clear the results text
   document.querySelector("#results").innerText = "";
 }
 
@@ -94,49 +77,33 @@ function emptySuggestions() {
  * @returns {boolean} True if navigation occurred, false otherwise.
  */
 function navigateSuggestions(event) {
-  let navigate = true;
-  const searchInput = document.getElementById("search");
   const suggestionsList = document.getElementById("suggestions");
   const items = suggestionsList.querySelectorAll("li");
+  if (!items.length) return false;
 
-  // Return if there are no items in the suggestions list
-  if (!items.length) return;
+  const currentSelected = suggestionsList.querySelector(".selected");
+  let index = Array.from(items).indexOf(currentSelected);
 
-  // Handle different key events for navigation
-  if (["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) {
-    const currentSelected = suggestionsList.querySelector(".selected");
-    let index = Array.from(items).indexOf(currentSelected);
-
-    switch (event.key) {
-      case "ArrowDown":
-        event.preventDefault();
-        // Move selection down
-        index = index < items.length - 1 ? index + 1 : 0;
-        break;
-      case "ArrowUp":
-        event.preventDefault();
-        // Move selection up
-        index = index > 0 ? index - 1 : items.length - 1;
-        break;
-      case "Enter":
-        // Access the selected suggestion
-        if (currentSelected) {
-          accessSuggestion(currentSelected.innerText);
-        }
-        return;
-      default:
-        return;
-    }
-
-    // Update the selected item
-    items.forEach((item) => item.classList.remove("selected"));
-    items[index].classList.add("selected");
-    setTimeout(() => items[index].scrollIntoView({ behavior: "smooth", block: "nearest" }), 10);
-  } else {
-    navigate = false;
+  switch (event.key) {
+    case "ArrowDown":
+      event.preventDefault();
+      index = (index + 1) % items.length;
+      break;
+    case "ArrowUp":
+      event.preventDefault();
+      index = (index - 1 + items.length) % items.length;
+      break;
+    case "Enter":
+      if (currentSelected) accessSuggestion(currentSelected.innerText);
+      return true;
+    default:
+      return false;
   }
 
-  return navigate;
+  items.forEach(item => item.classList.remove("selected"));
+  items[index].classList.add("selected");
+  setTimeout(() => items[index].scrollIntoView({ behavior: "smooth", block: "nearest" }), 10);
+  return true;
 }
 
 /**
@@ -145,7 +112,6 @@ function navigateSuggestions(event) {
  * @param {MouseEvent} event - The mouse event.
  */
 function transmitClick(event) {
-  // Access the suggestion based on the clicked element's text
   accessSuggestion(event.currentTarget.innerText);
 }
 
@@ -156,11 +122,8 @@ function transmitClick(event) {
  */
 function accessSuggestion(artistName) {
   const searchField = document.querySelector("#search");
-  // Set the search field value to the artist name
   searchField.value = artistName;
-  // Show the unique suggestion
   showUniqueSuggestion();
-  // Clear the search field value
   searchField.value = "";
 }
 
@@ -171,20 +134,16 @@ function accessSuggestion(artistName) {
  */
 function loadContent() {
   const gallery = document.querySelector("#gallery");
-  // Set the gallery content based on whether it's the welcome page
-  gallery.innerHTML = isWelcomePage() ? "<span class='push'></span>" : "";
-  gallery.style.marginTop = isWelcomePage() ? "" : "unset";
-  // Show or hide the return button based on the page state
-  showReturnButton(!isWelcomePage());
+  const isWelcome = isWelcomePage();
+  gallery.innerHTML = isWelcome ? "<span class='push'></span>" : "";
+  gallery.style.marginTop = isWelcome ? "" : "unset";
+  showReturnButton(!isWelcome);
 
-  if (isWelcomePage()) {
-    // Load artists if it's the welcome page
+  if (isWelcome) {
     loadArtists();
   } else {
-    // Load artworks if it's not the welcome page
     loadArtworks();
   }
-  // Show the navigation bar
   showNavBar();
 }
 
@@ -192,36 +151,30 @@ function loadContent() {
  * Loads the list of artists from the server.
  */
 function loadArtists() {
-  // Set the NSFW flag
   setIsNsfw();
+  const spinner = document.querySelector("#spinner");
+  spinner.classList.add("loading");
 
-  // Show the loading spinner
-  document.querySelector("#spinner").classList.add("loading");
   fetch(`${host}artists.php?isNsfw=${isNsfw}`)
-    .then((res) => res.json())
-    .then((artists) => {
-      // Update the spinner number with the total number of artists
-      document.querySelector("#spinnerNumber").innerText = "0 / " + Object.keys(artists).length;
-      Object.keys(artists).forEach((artistName, idx) => {
-        // Update the spinner number with the current index
-        document.querySelector("#spinnerNumber").innerText = idx + " / " + Object.keys(artists).length;
-        // Generate a card for each artist
-        const card = generateCard(artistName, Object.values(artists)[idx]);
-        // Add a click event to the card
+    .then(res => res.json())
+    .then(artists => {
+      const spinnerNumber = document.querySelector("#spinnerNumber");
+      const artistKeys = Object.keys(artists);
+      spinnerNumber.innerText = `0 / ${artistKeys.length}`;
+
+      artistKeys.forEach((artistName, idx) => {
+        spinnerNumber.innerText = `${idx + 1} / ${artistKeys.length}`;
+        const card = generateCard(artistName, artists[artistName]);
         addClick(card, goToArtist);
       });
     })
-    .catch((err) => console.error("Failed to update artist list:", err.message))
+    .catch(err => console.error("Failed to update artist list:", err.message))
     .finally(() => {
-      // Hide the loading spinner
+      spinner.classList.remove("loading");
       document.querySelector("#spinnerNumber").innerText = "";
-      document.querySelector("#spinner").classList.remove("loading");
-
-      // Add input event to the search field
       addInput(document.querySelector("#search"), showSuggestions);
 
-      // Show unique suggestion if the search field is not empty
-      if (document.querySelector("#search").value !== "") {
+      if (document.querySelector("#search").value) {
         setTimeout(showUniqueSuggestion, 500);
       }
     });
@@ -234,33 +187,34 @@ async function loadArtworks() {
   const searchParams = new URLSearchParams(window.location.search);
   const artist = searchParams.get("artist");
 
-  const response = await fetch(`${host}artworks.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ artist: artist }),
-  })
-    .then((res) => res.json())
-    .then((artworks) => {
-      // Process the artworks and set the thumbnails
-      artworks = artworks.map((artwork) => artwork.split("/").splice(1).join("/"));
-      progress("thumbnails", artist);
-      setTimeout(function(){
-        setThumbnails(artist, artworks);
-      }, 250);
-    })
-    .catch((err) => console.error("Failed to update artworks list:", err.message))
-    .finally(() => {
-      // Clear the spinner number
-      document.querySelector("#spinnerNumber").innerHTML = "";
+  try {
+    const response = await fetch(`${host}artworks.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ artist }),
     });
+    const artworks = await response.json();
+    const processedArtworks = artworks.map(artwork => artwork.split("/").slice(1).join("/"));
+    await progress("thumbnails", artist);
+    setTimeout(() => setThumbnails(artist, processedArtworks), 250);
+  } catch (err) {
+    console.error("Failed to update artworks list:", err.message);
+  } finally {
+    document.querySelector("#spinnerNumber").innerHTML = "";
+  }
 }
 
+/**
+ * Updates the progress of an ongoing action for a specific artist.
+ *
+ * @param {string} action - The action being performed (e.g., "thumbnails").
+ * @param {string} artist - The name of the artist.
+ */
 async function progress(action, artist) {
   const spinner = document.querySelector("#spinner");
   const spinnerNumber = document.querySelector("#spinnerNumber");
   const progressMore = document.querySelector("#progressMore");
 
-  // Ensure spinner is visible
   if (!spinner.classList.contains("loading")) {
     spinner.classList.add("loading");
   }
@@ -279,9 +233,7 @@ async function progress(action, artist) {
     const currentPercentage = parseFloat(spinnerNumber.textContent);
 
     if (currentPercentage === percentage) {
-      progressMore.textContent = progressMore.textContent.length === 23 
-        ? "." 
-        : progressMore.textContent + ".";
+      progressMore.textContent = progressMore.textContent.length === 23 ? "." : progressMore.textContent + ".";
     } else {
       spinnerNumber.textContent = `${percentage}%`;
       progressMore.textContent = "";
@@ -294,19 +246,22 @@ async function progress(action, artist) {
   }
 }
 
+/**
+ * Sets the thumbnails for the specified artist's artworks.
+ *
+ * @param {string} artist - The name of the artist.
+ * @param {Array<string>} artworks - The list of artworks.
+ */
 async function setThumbnails(artist, artworks) {
   const spinner = document.querySelector("#spinner");
   const spinnerNumber = document.querySelector("#spinnerNumber");
-  
-  // Initialize progress
+
   spinnerNumber.textContent = "0%";
   spinner.classList.add("loading");
   console.info(`${artist}: 0% - Start`);
 
   try {
-    // Process artworks sequentially
-    for (const [index, artwork] of artworks.entries()) {
-      // 1. Send individual artwork request
+    for (const artwork of artworks) {
       const response = await fetch(`${host}thumbnail.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -314,16 +269,10 @@ async function setThumbnails(artist, artworks) {
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      // 2. Update progress after each successful request
-      await progress("thumbnails", artist); // Use appropriate action name
+      await progress("thumbnails", artist);
     }
 
-    artworks.forEach((artwork) => {
-      generatePreview("../"+artwork);
-    });
-
-    // Final completion
+    artworks.forEach(artwork => generatePreview(`../${artwork}`));
     console.info(`${artist}: 100% - End`);
     spinnerNumber.textContent = "100%";
   } catch (error) {
@@ -337,17 +286,17 @@ async function setThumbnails(artist, artworks) {
  * Checks for new artists on the server.
  */
 function checkNew() {
-  // Show the loading spinner
-  document.querySelector("#spinner").classList.add("loading");
+  const spinner = document.querySelector("#spinner");
+  spinner.classList.add("loading");
+
   fetch(`${host}new.php`)
-    .then((res) => res.json())
-    .then((artists) => {
+    .then(res => res.json())
+    .then(artists => {
       if (artists.length > 0) console.info(artists);
     })
-    .catch((err) => console.log("Failed to check new artists:", err.message))
+    .catch(err => console.log("Failed to check new artists:", err.message))
     .finally(() => {
-      // Hide the loading spinner
-      document.querySelector("#spinner").classList.remove("loading");
+      spinner.classList.remove("loading");
     });
 }
 
@@ -359,13 +308,8 @@ function checkNew() {
  * @param {HTMLElement} root - The root element containing the filter buttons.
  */
 function reloadFiltersButtons(root) {
-  // Set the default checked state for the NSFW filter button
   root.querySelector(`input[type='radio'][value='${isNsfw}']`).defaultChecked = true;
-
-  // Add click events to the filter buttons
-  Array.from(root.querySelectorAll("span > label")).forEach((btn) => {
-    addClick(btn, changeFilter);
-  });
+  root.querySelectorAll("span > label").forEach(btn => addClick(btn, changeFilter));
 }
 
 /**
@@ -374,15 +318,12 @@ function reloadFiltersButtons(root) {
  * @param {boolean} showReturnButton - Whether to show the return button.
  */
 function showReturnButton(showReturnButton) {
-  const navElement = document.querySelector("nav");
-
+  const returnBtn = document.getElementById("returnBtn");
   if (showReturnButton) {
-    // Show the return button and add a click event
-    document.getElementById("returnBtn").removeAttribute("hidden");
-    addClick(document.getElementById("returnBtn"), returnIndex);
+    returnBtn.removeAttribute("hidden");
+    addClick(returnBtn, returnIndex);
   } else {
-    // Hide the return button
-    document.getElementById("returnBtn").setAttribute("hidden", "hidden");
+    returnBtn.setAttribute("hidden", "hidden");
   }
 }
 
@@ -390,12 +331,11 @@ function showReturnButton(showReturnButton) {
  * Shows or hides the navigation bar based on the current page state.
  */
 function showNavBar() {
+  const nav = document.querySelector("nav");
   if (isWelcomePage()) {
-    // Show the navigation bar
-    document.querySelector("nav").removeAttribute("hidden");
+    nav.removeAttribute("hidden");
   } else {
-    // Hide the navigation bar
-    document.querySelector("nav").setAttribute("hidden", "hidden");
+    nav.setAttribute("hidden", "hidden");
   }
 }
 
@@ -405,39 +345,30 @@ function showNavBar() {
  * @param {Event} event - The input event.
  */
 function showSuggestions(event) {
-  // Clear the suggestions list
   emptySuggestions();
-  let search = event.currentTarget.value;
+  const search = event.currentTarget.value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
 
-  if (search && document.querySelectorAll(".card").length > 1) {
-    Array.from(document.querySelectorAll(".card")).forEach((card, idx) => {
-      const cardName = card.id.trim();
-      const included = cardName.toLowerCase().startsWith(search.toLowerCase());
+  if (search && cards.length > 1) {
+    cards.forEach((card, idx) => {
+      const cardName = card.id.trim().toLowerCase();
+      const included = cardName.startsWith(search);
 
-      // Update the card visibility based on the search term
       card.dataset.hidden = !included;
       card.classList.remove("searched");
 
       if (included) {
-        // Create a suggestion list item
         const li = document.createElement("li");
         li.innerHTML = cardName;
-        li.dataset.card = "#" + cardName;
+        li.dataset.card = `#${cardName}`;
         li.dataset.pos = idx;
         document.querySelector("#suggestions").appendChild(li);
-
-        // Add a click event to the suggestion list item
         addClick(li, transmitClick);
       }
     });
 
-    // Show the backdrop and update the results text
     document.querySelector("#backdrop").classList = "show";
-    document.querySelector("#results").innerText =
-      document.querySelector("#suggestions").childElementCount +
-      " / " +
-      Array.from(document.querySelectorAll(".card")).length;
-    // Add a keydown event to the search input
+    document.querySelector("#results").innerText = `${document.querySelector("#suggestions").childElementCount} / ${cards.length}`;
     addKeyDown(event.currentTarget, navigateSuggestions);
   }
 }
@@ -446,17 +377,15 @@ function showSuggestions(event) {
  * Shows the unique suggestion based on the current search input value.
  */
 function showUniqueSuggestion() {
-  const searchTerm = document.querySelector("#search").value.trim();
-  
-  Array.from(document.querySelectorAll(".card")).forEach((card) => {
-    if (card.id.toLowerCase() === searchTerm.toLowerCase()) {
-      // Highlight and scroll to the matching card
+  const searchTerm = document.querySelector("#search").value.trim().toLowerCase();
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+    if (card.id.toLowerCase() === searchTerm) {
       card.classList.add("searched");
       setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "nearest" }), 10);
-      // Clear the suggestions list
       emptySuggestions();
     } else {
-      // Hide non-matching cards
       card.dataset.hidden = true;
     }
   });
@@ -473,12 +402,11 @@ function changeFilter(event) {
   const newNsfwState = event.currentTarget.innerText === "NSFW";
   if (isNsfw !== newNsfwState) {
     const state = { data: "optional state object" };
-    const title = "Welcome " + isNsfw + " | ComEx";
+    const title = `Welcome ${isNsfw} | ComEx`;
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set("isNsfw", newNsfwState);
 
-    // Update the URL and push the new state to the history
-    const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
+    const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
     history.pushState(state, title, newUrl);
     document.querySelector("#search").value = "";
   }
@@ -491,16 +419,11 @@ function changeFilter(event) {
  */
 function goToArtist(event) {
   const state = { data: "optional state object" };
-  const title = event.currentTarget.id + " | ComEx";
+  const title = `${event.currentTarget.id} | ComEx`;
   const searchParams = new URLSearchParams(window.location.search);
-  if (searchParams.get("artist") === null) {
-    searchParams.append("artist", event.currentTarget.id);
-  } else {
-    searchParams.set("artist", event.currentTarget.id);
-  }
+  searchParams.set("artist", event.currentTarget.id);
 
-  // Update the URL and push the new state to the history
-  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
+  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
   history.pushState(state, title, newUrl);
   setPageTitle();
 }
@@ -514,7 +437,8 @@ function returnIndex() {
   const title = "Welcome | ComEx";
   const searchParams = new URLSearchParams(window.location.search);
   searchParams.delete("artist");
-  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
+
+  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
   history.pushState(state, title, newUrl);
   setPageTitle();
   document.querySelector("#search").value = artist;
