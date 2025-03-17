@@ -1,5 +1,5 @@
 // Base URL for API endpoints
-const host = "http://naslku.synology.me/Commissions/api/";
+const host = location.origin + location.pathname.replace("/v2/", "/api/");
 const page = "";
 // Global flag for NSFW content filtering
 var isNsfw;

@@ -10,6 +10,10 @@ require_once "./utilitaires.php";
 // Decode the JSON file containing SFW data
 $json = json_decode(file_get_contents("sfw.json"), true);
 
+if($json === null){
+    $json = [];
+}
+
 // Get the list of artists from the commissions directory, excluding certain files
 $repository = array_diff(scandir(json_decode(file_get_contents("api.json"), true)["commissions"]), [".", "..", "dummy.txt"]);
 

@@ -10,6 +10,10 @@ require_once "./utilitaires.php";
 // Load artists data from JSON file
 $artists = json_decode(file_get_contents("sfw.json"), true);
 
+if($artists === null){
+    $artists = [];
+}
+
 // Load repository paths from JSON file
 $repositories = json_decode(file_get_contents("api.json"), true);
 

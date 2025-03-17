@@ -19,6 +19,7 @@ $json = [];
 if(!$artwork){
     // If 'artwork' is not provided, get the 'artworks' parameter
     $artworks = getFormParameter("artworks");
+
     // Loop through each artwork and get its full path
     foreach($artworks as $artwork){
         $json[] = getFullPaths($artwork);

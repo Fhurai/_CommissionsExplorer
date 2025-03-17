@@ -498,7 +498,7 @@ function goToArtist(event) {
   }
 
   // Update the URL and push the new state to the history
-  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
+  const newUrl = `${location.pathname}${page}?` + searchParams.toString();
   history.pushState(state, title, newUrl);
   setPageTitle();
 }
@@ -512,7 +512,7 @@ function returnIndex() {
   const title = "Welcome | ComEx";
   const searchParams = new URLSearchParams(window.location.search);
   searchParams.delete("artist");
-  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
+  const newUrl = `${location.pathname}${page}?` + searchParams.toString();
   history.pushState(state, title, newUrl);
   setPageTitle();
   document.querySelector("#search").value = artist;
