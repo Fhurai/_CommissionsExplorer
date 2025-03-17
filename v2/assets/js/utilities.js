@@ -243,7 +243,10 @@ async function loadArtworks() {
     .then((artworks) => {
       // Process the artworks and set the thumbnails
       artworks = artworks.map((artwork) => artwork.split("/").splice(1).join("/"));
-      setThumbnails(artist, artworks);
+      progress("thumbnails", artist);
+      setTimeout(function(){
+        setThumbnails(artist, artworks);
+      }, 250);
     })
     .catch((err) => console.error("Failed to update artworks list:", err.message))
     .finally(() => {
@@ -252,98 +255,81 @@ async function loadArtworks() {
     });
 }
 
-/**
- * Updates the progress of an action for a specific artist.
- *
- * @param {string} action - The action being performed.
- * @param {string} artist - The artist for whom the action is being performed.
- */
 async function progress(action, artist) {
-  if (!document.querySelector("#spinner").classList.contains("loading")) {
-    // Show the loading spinner
-    document.querySelector("#spinner").classList.add("loading");
+  const spinner = document.querySelector("#spinner");
+  const spinnerNumber = document.querySelector("#spinnerNumber");
+  const progressMore = document.querySelector("#progressMore");
+
+  // Ensure spinner is visible
+  if (!spinner.classList.contains("loading")) {
+    spinner.classList.add("loading");
   }
 
-  await fetch(`${host}progress.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ action: action, artist: artist }),
-  })
-    .then((res) => res.json())
-    .then((progressValue) => {
-      // Calculate the progress percentage
-      const percentage = Math.round(progressValue * 10000) / 100;
+  try {
+    const response = await fetch(`${host}progress.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action, artist }),
+    });
 
-      // Update the spinner number and progress more text
-      if (parseFloat(document.querySelector("#spinnerNumber").innerHTML) === percentage) {
-        if (document.querySelector("#progressMore").innerText.length === 23) {
-          document.querySelector("#progressMore").innerHTML = "";
-        }
-        document.querySelector("#progressMore").innerHTML += ".";
-      } else {
-        document.querySelector("#spinnerNumber").innerText = `${percentage}%`;
-        document.querySelector("#progressMore").innerHTML = "";
-      }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      console.info(`${artist}: ${percentage}%`);
-    })
-    .catch((err) => console.error("Failed to update progress:", err.message));
+    const progressValue = await response.json();
+    const percentage = Math.round(progressValue * 10000) / 100;
+    const currentPercentage = parseFloat(spinnerNumber.textContent);
+
+    if (currentPercentage === percentage) {
+      progressMore.textContent = progressMore.textContent.length === 23 
+        ? "." 
+        : progressMore.textContent + ".";
+    } else {
+      spinnerNumber.textContent = `${percentage}%`;
+      progressMore.textContent = "";
+    }
+
+    console.info(`${artist}: ${percentage}%`);
+  } catch (err) {
+    console.error("Progress update failed:", err.message);
+    spinner.classList.remove("loading");
+  }
 }
 
-/**
- * Sets the thumbnails for the specified artist's artworks.
- *
- * @param {string} artist - The artist whose artworks are being displayed.
- * @param {Array<string>} artworks - The list of artworks.
- */
 async function setThumbnails(artist, artworks) {
-  // Show the loading spinner and set the initial progress
-  document.querySelector("#spinnerNumber").innerText = "0%";
-  document.querySelector("#spinner").classList.add("loading");
-
+  const spinner = document.querySelector("#spinner");
+  const spinnerNumber = document.querySelector("#spinnerNumber");
+  
+  // Initialize progress
+  spinnerNumber.textContent = "0%";
+  spinner.classList.add("loading");
   console.info(`${artist}: 0% - Start`);
 
   try {
-    await progress("thumbnails", artist)
-
-    if(document.querySelector("#spinnerNumber").innerText === '95.95%'){
+    // Process artworks sequentially
+    for (const [index, artwork] of artworks.entries()) {
+      // 1. Send individual artwork request
       const response = await fetch(`${host}thumbnail.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ artworks }),
+        body: JSON.stringify({ artworks: [artwork] }),
       });
-  
-      if (!response.ok) throw new Error(`HTTP ${response.status} response`);
-  
-      const thumbnails = await response.json();
-  
-      // Generate previews for each thumbnail
-      Object.values(thumbnails).forEach(([fullSizePath, thumbnailPath]) => {
-        generatePreview(fullSizePath);
-      }); 
-    }else{
-      Object.values(artworks).forEach(async (artwork) => {
-        const response = await fetch(`${host}thumbnail.php`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ artwork }),
-        });
-    
-        if (!response.ok) throw new Error(`HTTP ${response.status} response`);
-    
-        const thumbnails = await response.json();
 
-        generatePreview(thumbnails[0][0]);
-        progress("thumbnails", artist);
-      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      // 2. Update progress after each successful request
+      await progress("thumbnails", artist); // Use appropriate action name
     }
-  } catch (error) {
-    console.error("Failed to load gallery:", error.message);
-  } finally {
-    // Hide the loading spinner
+
+    artworks.forEach((artwork) => {
+      generatePreview("../"+artwork);
+    });
+
+    // Final completion
     console.info(`${artist}: 100% - End`);
-    document.querySelector("#spinnerNumber").innerHTML = "100%";
-    document.querySelector("#spinner").classList.remove("loading");
+    spinnerNumber.textContent = "100%";
+  } catch (error) {
+    console.error("Gallery load failed:", error.message);
+  } finally {
+    spinner.classList.remove("loading");
   }
 }
 
@@ -514,7 +500,7 @@ function goToArtist(event) {
   }
 
   // Update the URL and push the new state to the history
-  const newUrl = `${location.pathname}${page}?` + searchParams.toString();
+  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
   history.pushState(state, title, newUrl);
   setPageTitle();
 }
@@ -528,7 +514,7 @@ function returnIndex() {
   const title = "Welcome | ComEx";
   const searchParams = new URLSearchParams(window.location.search);
   searchParams.delete("artist");
-  const newUrl = `${location.pathname}${page}?` + searchParams.toString();
+  const newUrl = `/Commissions/v2/${page}?` + searchParams.toString();
   history.pushState(state, title, newUrl);
   setPageTitle();
   document.querySelector("#search").value = artist;

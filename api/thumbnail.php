@@ -26,7 +26,7 @@ if(!$artwork){
     }
 }else{
     // If 'artwork' is provided, get its full path
-    $json[] = getFullPaths($artwork);
+    $json = getFullPaths($artwork);
 }
 
 // Encode the array to JSON format and output it

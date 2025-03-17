@@ -28,7 +28,10 @@ $progress = 0.0;
 switch($action){
     case "thumbnails":
         // Explore the commissions folder for the artist
-        $commFolder = explorePath($repositories["commissions"].$artist);
+        $commFolder = array_filter(explorePath($repositories["commissions"].$artist), function($file){
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            return in_array($extension, ["jpg", "jpeg", "png", "gif"]);
+        });
         
         // Create thumbnails folder if it doesn't exist
         if(!is_dir($repositories["thumbs"].$artist)){
