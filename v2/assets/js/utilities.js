@@ -258,13 +258,13 @@ async function loadArtworks() {
  * @param {string} action - The action being performed.
  * @param {string} artist - The artist for whom the action is being performed.
  */
-function progress(action, artist) {
+async function progress(action, artist) {
   if (!document.querySelector("#spinner").classList.contains("loading")) {
     // Show the loading spinner
     document.querySelector("#spinner").classList.add("loading");
   }
 
-  fetch(`${host}progress.php`, {
+  await fetch(`${host}progress.php`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ action: action, artist: artist }),
@@ -302,29 +302,45 @@ async function setThumbnails(artist, artworks) {
   document.querySelector("#spinner").classList.add("loading");
 
   console.info(`${artist}: 0% - Start`);
-  let timerId = setInterval(() => progress("thumbnails", artist), 1000);
 
   try {
-    const response = await fetch(`${host}thumbnail.php`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ artworks }),
-    });
+    await progress("thumbnails", artist)
 
-    if (!response.ok) throw new Error(`HTTP ${response.status} response`);
+    if(document.querySelector("#spinnerNumber").innerText === '95.95%'){
+      const response = await fetch(`${host}thumbnail.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworks }),
+      });
+  
+      if (!response.ok) throw new Error(`HTTP ${response.status} response`);
+  
+      const thumbnails = await response.json();
+  
+      // Generate previews for each thumbnail
+      Object.values(thumbnails).forEach(([fullSizePath, thumbnailPath]) => {
+        generatePreview(fullSizePath);
+      }); 
+    }else{
+      Object.values(artworks).forEach(async (artwork) => {
+        const response = await fetch(`${host}thumbnail.php`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ artwork }),
+        });
+    
+        if (!response.ok) throw new Error(`HTTP ${response.status} response`);
+    
+        const thumbnails = await response.json();
 
-    const thumbnails = await response.json();
-
-    // Generate previews for each thumbnail
-    Object.values(thumbnails).forEach(([fullSizePath, thumbnailPath]) => {
-      generatePreview(fullSizePath);
-    });
+        generatePreview(thumbnails[0][0]);
+        progress("thumbnails", artist);
+      });
+    }
   } catch (error) {
     console.error("Failed to load gallery:", error.message);
   } finally {
-    // Clear the interval and hide the loading spinner
-    clearInterval(timerId);
-    timerId = null;
+    // Hide the loading spinner
     console.info(`${artist}: 100% - End`);
     document.querySelector("#spinnerNumber").innerHTML = "100%";
     document.querySelector("#spinner").classList.remove("loading");
