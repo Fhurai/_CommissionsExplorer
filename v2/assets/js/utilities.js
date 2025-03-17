@@ -1,23 +1,22 @@
 /**
- * Reloads the current page.
+ * Reloads the current page using browser's location API.
+ * @function reloadPage
  */
-function reloadPage(){
+function reloadPage() {
   location.reload();
 }
 
 /**
  * Capitalizes the first letter of a string and converts the rest to lowercase.
- *
- * @param {string} string - The input string to transform.
- * @returns {string} The transformed string with the first letter capitalized.
- *
+ * @function ucFirst
+ * @param {string} string - The input string to transform
+ * @returns {string} Transformed string with first letter capitalized
  * @example
  * ucFirst('hello');    // Returns 'Hello'
  * ucFirst('HELLO');    // Returns 'Hello'
  * ucFirst('');         // Returns ''
- *
- * @note Handles empty strings gracefully.
- * @warning Does not check input type (expects string).
+ * @note Gracefully handles empty strings by returning empty string
+ * @warning Expects string input - no type validation performed
  */
 function ucFirst(string) {
   if (!string) return "";
@@ -25,16 +24,13 @@ function ucFirst(string) {
 }
 
 /**
- * Dynamically sets the document title based on URL query parameters.
- *
- * - Uses the "artist" query parameter if present (capitalized via ucFirst()).
- * - Defaults to "Welcome | ComEx" when no artist parameter exists.
- * - Updates document.title directly.
- *
+ * Dynamically sets document title based on URL parameters.
  * @function setPageTitle
+ * @description Uses "artist" query parameter if present (capitalized via ucFirst()),
+ * defaults to "Welcome | ComEx" when no artist parameter exists.
  * @example
- * // For URL: https://example.com/?artist=picasso
- * // Sets document.title to "Picasso | ComEx"
+ * // URL: https://example.com/?artist=picasso
+ * // Sets title to "Picasso | ComEx"
  */
 function setPageTitle() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -43,16 +39,23 @@ function setPageTitle() {
 }
 
 /**
- * Checks if the current page is the welcome page.
- *
- * @returns {boolean} True if the current page is the welcome page, false otherwise.
+ * Determines if current page is the welcome page.
+ * @function isWelcomePage
+ * @returns {boolean} True if document title matches welcome page title
+ * @example
+ * // When title is "Welcome | ComEx"
+ * isWelcomePage();  // Returns true
  */
 function isWelcomePage() {
   return document.title === "Welcome | ComEx";
 }
 
 /**
- * Sets the NSFW (Not Safe For Work) flag based on URL query parameters.
+ * Sets NSFW (Not Safe For Work) flag based on URL parameters.
+ * @function setIsNsfw
+ * @description Checks both welcome page status and "isNsfw" query parameter.
+ * Modifies global `isNsfw` variable.
+ * @note Requires `isWelcomePage()` to be true for NSFW flag activation
  */
 function setIsNsfw() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -60,7 +63,12 @@ function setIsNsfw() {
 }
 
 /**
- * Empties the suggestions list and hides related UI elements.
+ * Clears suggestion list and resets UI elements.
+ * @function emptySuggestions
+ * @description Performs three main actions:
+ * 1. Removes all child elements from suggestions list
+ * 2. Hides suggestions container and backdrop
+ * 3. Clears results text
  */
 function emptySuggestions() {
   const suggestions = document.querySelector("#suggestions");
@@ -71,10 +79,15 @@ function emptySuggestions() {
 }
 
 /**
- * Handles keyboard navigation within the suggestions list.
- *
- * @param {KeyboardEvent} event - The keyboard event.
- * @returns {boolean} True if navigation occurred, false otherwise.
+ * Handles keyboard navigation in suggestions list.
+ * @function navigateSuggestions
+ * @param {KeyboardEvent} event - Keyboard event object
+ * @returns {boolean} True if navigation occurred, false otherwise
+ * @description Supports:
+ * - ArrowDown: Select next item
+ * - ArrowUp: Select previous item
+ * - Enter: Activate current selection
+ * @note Prevents default behavior for arrow keys to avoid page scrolling
  */
 function navigateSuggestions(event) {
   const suggestionsList = document.getElementById("suggestions");
@@ -107,18 +120,27 @@ function navigateSuggestions(event) {
 }
 
 /**
- * Transmits a click event to access a suggestion.
- *
- * @param {MouseEvent} event - The mouse event.
+ * Handles click events on suggestion elements and triggers suggestion access.
+ * @function transmitClick
+ * @param {MouseEvent} event - The mouse event from suggestion click
+ * @description Acts as an event handler bridge between UI clicks and suggestion system
+ * @example
+ * // HTML
+ * <li onclick="transmitClick(event)">Artist Name</li>
  */
 function transmitClick(event) {
   accessSuggestion(event.currentTarget.innerText);
 }
 
 /**
- * Accesses a suggestion by setting the search field value and showing the unique suggestion.
- *
- * @param {string} artistName - The name of the artist to access.
+ * Processes artist suggestion selection and resets search interface.
+ * @function accessSuggestion
+ * @param {string} artistName - The selected artist name
+ * @description Performs three main actions:
+ * 1. Sets search field value to selected artist
+ * 2. Triggers unique suggestion display
+ * 3. Clears search field for future interactions
+ * @note Temporarily shows selected artist in search field before clearing
  */
 function accessSuggestion(artistName) {
   const searchField = document.querySelector("#search");
@@ -127,10 +149,19 @@ function accessSuggestion(artistName) {
   searchField.value = "";
 }
 
-// *** Load functions
+// *** Content Loading Functions ***
 
 /**
- * Loads the content of the page based on the current state.
+ * Controls initial page content setup based on current page state.
+ * @function loadContent
+ * @description Orchestrates page layout by:
+ * - Resetting gallery container
+ * - Adjusting page margins
+ * - Managing return button visibility
+ * - Routing to appropriate content loader (artists/artworks)
+ * - Always showing navigation bar
+ * @see loadArtists
+ * @see loadArtworks
  */
 function loadContent() {
   const gallery = document.querySelector("#gallery");
@@ -148,7 +179,17 @@ function loadContent() {
 }
 
 /**
- * Loads the list of artists from the server.
+ * Loads and displays artist cards from server with progress tracking.
+ * @function loadArtists
+ * @description Implements:
+ * - NSFW flag initialization
+ * - Loading spinner activation
+ * - Batch artist card generation
+ * - Progress counter updates
+ * - Error handling and cleanup
+ * - Search input initialization
+ * @note Uses global `host` variable for API endpoint
+ * @warning Modifies DOM extensively through card generation
  */
 function loadArtists() {
   setIsNsfw();
@@ -181,7 +222,16 @@ function loadArtists() {
 }
 
 /**
- * Loads the list of artworks for the specified artist from the server.
+ * Loads artwork data for specific artist with thumbnail processing.
+ * @function loadArtworks
+ * @async
+ * @description Handles:
+ * - Artist parameter extraction from URL
+ * - Artwork data fetching via POST
+ * - Path processing for artwork files
+ * - Progress tracking visualization
+ * - Thumbnail population with delay
+ * @note Uses 250ms delay before thumbnail display for UI smoothness
  */
 async function loadArtworks() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -205,10 +255,18 @@ async function loadArtworks() {
 }
 
 /**
- * Updates the progress of an ongoing action for a specific artist.
- *
- * @param {string} action - The action being performed (e.g., "thumbnails").
- * @param {string} artist - The name of the artist.
+ * Tracks and displays progress of long-running operations.
+ * @function progress
+ * @async
+ * @param {string} action - The operation type being tracked (e.g., 'thumbnails')
+ * @param {string} artist - Target artist for progress tracking
+ * @description Provides:
+ * - Visual loading indicators
+ * - Percentage progress updates
+ * - Activity monitoring dots for stalled progress
+ * - Server communication for progress data
+ * @example
+ * await progress("processing", "van-gogh");
  */
 async function progress(action, artist) {
   const spinner = document.querySelector("#spinner");
@@ -247,10 +305,19 @@ async function progress(action, artist) {
 }
 
 /**
- * Sets the thumbnails for the specified artist's artworks.
- *
- * @param {string} artist - The name of the artist.
- * @param {Array<string>} artworks - The list of artworks.
+ * Manages thumbnail generation and display for artist artworks.
+ * @async
+ * @function setThumbnails
+ * @param {string} artist - Artist name for thumbnail processing
+ * @param {Array<string>} artworks - Array of artwork file paths
+ * @description Handles:
+ * - Progress indicator initialization
+ * - Batch thumbnail processing via API
+ * - Progress percentage updates
+ * - Final preview generation
+ * - Error handling and cleanup
+ * @example
+ * await setThumbnails('vangogh', ['/paintings/starry-night.jpg']);
  */
 async function setThumbnails(artist, artworks) {
   const spinner = document.querySelector("#spinner");
@@ -283,7 +350,14 @@ async function setThumbnails(artist, artworks) {
 }
 
 /**
- * Checks for new artists on the server.
+ * Checks for newly added artists via API.
+ * @function checkNew
+ * @description Performs:
+ * - Loading indicator activation
+ * - New artist detection
+ * - Console logging of results
+ * - Silent failure on errors
+ * @note Does not update UI - only logs results to console
  */
 function checkNew() {
   const spinner = document.querySelector("#spinner");
@@ -300,12 +374,16 @@ function checkNew() {
     });
 }
 
-// *** Show/Hide functions
+// *** UI Visibility Controllers ***
 
 /**
- * Reloads the filter buttons based on the current NSFW state.
- *
- * @param {HTMLElement} root - The root element containing the filter buttons.
+ * Resets filter buttons to reflect current NSFW state.
+ * @function reloadFiltersButtons
+ * @param {HTMLElement} root - Container element for filter controls
+ * @description Updates:
+ * - Radio button selection state
+ * - Click event handlers for filter buttons
+ * @warning Modifies DOM event listeners - ensure proper cleanup
  */
 function reloadFiltersButtons(root) {
   root.querySelector(`input[type='radio'][value='${isNsfw}']`).defaultChecked = true;
@@ -313,9 +391,13 @@ function reloadFiltersButtons(root) {
 }
 
 /**
- * Shows or hides the return button based on the specified flag.
- *
- * @param {boolean} showReturnButton - Whether to show the return button.
+ * Controls return button visibility and functionality.
+ * @function showReturnButton
+ * @param {boolean} showReturnButton - Toggle button visibility
+ * @description Manages:
+ * - Hidden attribute state
+ * - Click handler attachment/removal
+ * - Navigation behavior through returnIndex()
  */
 function showReturnButton(showReturnButton) {
   const returnBtn = document.getElementById("returnBtn");
@@ -328,7 +410,10 @@ function showReturnButton(showReturnButton) {
 }
 
 /**
- * Shows or hides the navigation bar based on the current page state.
+ * Toggles navigation bar visibility based on page state.
+ * @function showNavBar
+ * @description Uses isWelcomePage() check to determine visibility
+ * @see isWelcomePage
  */
 function showNavBar() {
   const nav = document.querySelector("nav");
@@ -340,9 +425,16 @@ function showNavBar() {
 }
 
 /**
- * Shows suggestions based on the current search input value.
- *
- * @param {Event} event - The input event.
+ * Handles real-time search suggestions and card filtering.
+ * @function showSuggestions
+ * @param {Event} event - Input event from search field
+ * @description Implements:
+ * - Search term normalization
+ * - Card visibility filtering
+ * - Suggestion list population
+ * - Result count display
+ * - Keyboard navigation setup
+ * @note Clears previous suggestions with emptySuggestions()
  */
 function showSuggestions(event) {
   emptySuggestions();
@@ -374,7 +466,16 @@ function showSuggestions(event) {
 }
 
 /**
- * Shows the unique suggestion based on the current search input value.
+ * Highlights and scrolls to exact match card based on search input.
+ * @function showUniqueSuggestion
+ * @description Handles:
+ * - Search term normalization
+ * - Exact match card highlighting
+ * - Smooth scroll to matching card
+ * - Automatic suggestion list cleanup
+ * @example
+ * // When search matches exact card ID
+ * showUniqueSuggestion(); // Scrolls to card and hides others
  */
 function showUniqueSuggestion() {
   const searchTerm = document.querySelector("#search").value.trim().toLowerCase();
@@ -391,55 +492,73 @@ function showUniqueSuggestion() {
   });
 }
 
-// *** Move functions
+// *** Navigation Controllers ***
 
 /**
- * Changes the filter based on the clicked button.
- *
- * @param {Event} event - The click event.
+ * Toggles NSFW content filter state and updates UI.
+ * @function changeFilter
+ * @param {Event} event - Click event from filter button
+ * @description Implements:
+ * - State comparison to prevent redundant updates
+ * - History API integration for state management
+ * - URL parameter synchronization
+ * - Search field reset
+ * @note Maintains page identifier through global 'page' variable
  */
 function changeFilter(event) {
-  const newNsfwState = event.currentTarget.innerText === "NSFW";
-  if (isNsfw !== newNsfwState) {
-    const state = { data: "optional state object" };
-    const title = `Welcome ${isNsfw} | ComEx`;
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("isNsfw", newNsfwState);
+  const newNsfwState = event.currentTarget.innerText === "NSFW"; // Determine new NSFW state based on button text
+  if (isNsfw !== newNsfwState) { // Only proceed if the state has changed
+    const state = { data: "optional state object" }; // Create a state object for history
+    const title = `Welcome ${isNsfw} | ComEx`; // Set the new title
+    const searchParams = new URLSearchParams(window.location.search); // Get current URL parameters
+    searchParams.set("isNsfw", newNsfwState); // Update the NSFW parameter
 
-    const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
-    history.pushState(state, title, newUrl);
-    document.querySelector("#search").value = "";
+    const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`; // Construct the new URL
+    history.pushState(state, title, newUrl); // Push the new state to history
+    document.querySelector("#search").value = ""; // Clear the search field
   }
 }
 
 /**
- * Navigates to the artist page based on the clicked element.
- *
- * @param {Event} event - The click event.
+ * Navigates to artist-specific view with state management.
+ * @function goToArtist
+ * @param {Event} event - Click event from artist card
+ * @description Handles:
+ * - Artist parameter injection into URL
+ * - Page title updates
+ * - Browser history state preservation
+ * @see setPageTitle
  */
 function goToArtist(event) {
-  const state = { data: "optional state object" };
-  const title = `${event.currentTarget.id} | ComEx`;
-  const searchParams = new URLSearchParams(window.location.search);
-  searchParams.set("artist", event.currentTarget.id);
+  const state = { data: "optional state object" }; // Create a state object for history
+  const title = `${event.currentTarget.id} | ComEx`; // Set the new title based on the artist's ID
+  const searchParams = new URLSearchParams(window.location.search); // Get current URL parameters
+  searchParams.set("artist", event.currentTarget.id); // Update the artist parameter
 
-  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
-  history.pushState(state, title, newUrl);
-  setPageTitle();
+  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`; // Construct the new URL
+  history.pushState(state, title, newUrl); // Push the new state to history
+  setPageTitle(); // Update the page title
 }
 
 /**
- * Returns to the index page from the artist page.
+ * Returns to main index view from artist page.
+ * @function returnIndex
+ * @description Manages:
+ * - Artist parameter removal from URL
+ * - Search field preservation of current artist
+ * - History state reset
+ * - Title restoration
+ * @note Maintains artist name in search field for quick re-search
  */
 function returnIndex() {
-  const artist = document.title.split("|")[0].trim();
-  const state = { data: "optional state object" };
-  const title = "Welcome | ComEx";
-  const searchParams = new URLSearchParams(window.location.search);
-  searchParams.delete("artist");
+  const artist = document.title.split("|")[0].trim(); // Extract the artist name from the title
+  const state = { data: "optional state object" }; // Create a state object for history
+  const title = "Welcome | ComEx"; // Set the new title
+  const searchParams = new URLSearchParams(window.location.search); // Get current URL parameters
+  searchParams.delete("artist"); // Remove the artist parameter
 
-  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`;
-  history.pushState(state, title, newUrl);
-  setPageTitle();
-  document.querySelector("#search").value = artist;
+  const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`; // Construct the new URL
+  history.pushState(state, title, newUrl); // Push the new state to history
+  setPageTitle(); // Update the page title
+  document.querySelector("#search").value = artist; // Set the search field value to the artist name
 }
