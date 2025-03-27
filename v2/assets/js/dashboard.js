@@ -1,8 +1,10 @@
 // Global variable to store the total number of commissions.
 let totalCommissions = 0;
+
+// Object to store sorting states for SFW and NSFW tables.
 let sortStates = {
-  sfw: { order: [], type: "desc" },
-  nsfw: { order: [], type: "desc" },
+  sfw: { order: [], type: "desc" }, // Sorting state for SFW table.
+  nsfw: { order: [], type: "desc" }, // Sorting state for NSFW table.
 };
 
 /**
@@ -10,7 +12,7 @@ let sortStates = {
  * This event listener waits for the DOM content to be fully loaded before executing the `getStats` function.
  */
 document.addEventListener("DOMContentLoaded", () => {
-  getStats();
+  getStats(); // Fetch and display statistics once the DOM is fully loaded.
 });
 
 /**
@@ -20,20 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
  * 1. Fetches data from the API endpoint.
  * 2. Parses the response as JSON.
  * 3. Calls `generatePanels` to create the main dashboard panels.
- * 4. Calls `generateArtistsPanel` to create individual artist panels.
+ * 4. Calls `generateArtistsTable` to create individual artist tables.
  * 5. Handles errors using `handleError`.
  * 6. Logs a debug message when the process is complete.
  */
 function getStats() {
-  fetch("http://naslku.synology.me/Commissions/api/stats.php") // API endpoint for fetching statistics.
-    .then((res) => res.json()) // Converts the response to JSON format.
+  // Fetch data from the API endpoint.
+  fetch("http://naslku.synology.me/Commissions/api/stats.php")
+    .then((res) => res.json()) // Parse the response as JSON.
     .then((stats) => {
-      generatePanels(stats); // Generates the main dashboard panels.
-      document.body.innerHTML += "<hr>"; // Adds a horizontal line for separation.
-      generateArtistsTable(stats); // Generates the artists table.
+      generatePanels(stats); // Generate the main dashboard panels.
+      document.body.innerHTML += "<hr>"; // Add a horizontal line for separation.
+      generateArtistsTable(stats); // Generate the artists table.
     })
-    .catch(handleError) // Handles any errors during the fetch process.
-    .finally(() => console.debug("Stats checked.")); // Logs a debug message when done.
+    .catch(handleError) // Handle any errors during the fetch process.
+    .finally(() => console.debug("Stats checked.")); // Log a debug message when done.
 }
 
 /**
@@ -43,6 +46,7 @@ function getStats() {
  * Logs the error message to the console.
  */
 function handleError(error) {
+  // Log the error message to the console.
   console.error("Failed to check stats:", error.message);
 }
 
@@ -59,31 +63,31 @@ function handleError(error) {
 function generatePanels(stats) {
   // Generate the "Total" panel with combined statistics.
   generatePanel({
-    id: "Total",
+    id: "Total", // Panel ID.
     sections: [
-      createToggleSection("Artistes", stats, "artists"), // Toggle section for artists.
-      createToggleSection("Commissions", stats, "commissions"), // Toggle section for commissions.
-      createImageRatioSection(stats), // Image ratio section.
+      createToggleSection("Artistes", stats, "artists"), // Create toggle section for artists.
+      createToggleSection("Commissions", stats, "commissions"), // Create toggle section for commissions.
+      createImageRatioSection(stats), // Create image ratio section.
     ],
   });
 
   // Generate the "SFW" panel with SFW-specific statistics.
   generatePanel({
-    id: "SFW",
+    id: "SFW", // Panel ID.
     sections: [
-      createStatItem("Artistes", stats.sfw.artists.count), // SFW artist count.
-      createStatItem("Commissions", stats.sfw.commissions.count), // SFW commission count.
-      createImageSubsection(stats.sfw, "sfw"), // SFW image subsection.
+      createStatItem("Artistes", stats.sfw.artists.count), // Add SFW artist count.
+      createStatItem("Commissions", stats.sfw.commissions.count), // Add SFW commission count.
+      createImageSubsection(stats.sfw, "sfw"), // Add SFW image subsection.
     ],
   });
 
   // Generate the "NSFW" panel with NSFW-specific statistics.
   generatePanel({
-    id: "NSFW",
+    id: "NSFW", // Panel ID.
     sections: [
-      createStatItem("Artistes", stats.nsfw.artists.count), // NSFW artist count.
-      createStatItem("Commissions", stats.nsfw.commissions.count), // NSFW commission count.
-      createImageSubsection(stats.nsfw, "nsfw"), // NSFW image subsection.
+      createStatItem("Artistes", stats.nsfw.artists.count), // Add NSFW artist count.
+      createStatItem("Commissions", stats.nsfw.commissions.count), // Add NSFW commission count.
+      createImageSubsection(stats.nsfw, "nsfw"), // Add NSFW image subsection.
     ],
   });
 }
@@ -99,87 +103,121 @@ function generatePanels(stats) {
  * }
  */
 function generatePanel(config) {
+  // Create a panel container.
   const panel = document.createElement("div");
-  panel.className = "panel";
-  panel.id = config.id;
+  panel.className = "panel"; // Add panel class for styling.
+  panel.id = config.id; // Set the panel ID.
 
+  // Append each section to the panel.
   config.sections.forEach((section) => {
-    const container = createContainer();
-    container.appendChild(section);
-    panel.appendChild(container);
+    const container = createContainer(); // Create a container for the section.
+    container.appendChild(section); // Append the section to the container.
+    panel.appendChild(container); // Append the container to the panel.
   });
 
+  // Append the panel to the document body.
   document.body.appendChild(panel);
 }
 
+/**
+ * Generates the artists table for SFW and NSFW data.
+ *
+ * @param {object} stats - The statistics object containing SFW and NSFW data.
+ */
 function generateArtistsTable(stats) {
+  // Generate the table for SFW data.
   generateTable(stats.sfw, "sfw");
 
+  // Add a horizontal line for separation.
   const hr = document.createElement("hr");
   document.body.appendChild(hr);
 
+  // Generate the table for NSFW data.
   generateTable(stats.nsfw, "nsfw");
 }
 
+/**
+ * Generates a table for the given statistics and label.
+ *
+ * @param {object} stats - The statistics object containing data for artists, commissions, and thumbnails.
+ * @param {string} label - The label for the table (e.g., "sfw" or "nsfw").
+ */
 function generateTable(stats, label) {
+  // Create a container for the table.
   const container = document.createElement("div");
-  container.classList = "table-container";
+  container.classList = "table-container"; // Add class for styling.
   document.body.appendChild(container);
 
+  // Create the table element.
   const table = document.createElement("table");
-  table.className = "table";
-  table.id = label;
+  table.className = "table"; // Add class for styling.
+  table.id = label; // Set the table ID.
   container.appendChild(table);
+
+  // Create the table header.
   const header = document.createElement("thead");
   table.appendChild(header);
 
+  // Create the header row.
   const headerRow = document.createElement("tr");
   header.appendChild(headerRow);
 
+  // Create the search row.
   const searchRow = document.createElement("tr");
   header.appendChild(searchRow);
 
+  // Add header cells and search inputs.
   ["Artist", "# Commissions", "% Total", "# Pictures", "Ratio P / C"].forEach(
     (header, idx) => {
       const th = document.createElement("th");
-      th.textContent = header;
-      th.addEventListener("click", clickHeader);
+      th.textContent = header; // Set the header text.
+      th.addEventListener("click", clickHeader); // Add click event for sorting.
       headerRow.appendChild(th);
 
       const tdSearch = document.createElement("td");
       const inputSearch = document.createElement("input");
-      inputSearch.type = idx === 0 ? "text" : "number";
+      inputSearch.type = idx === 0 ? "text" : "number"; // Set input type.
       if (idx !== 0) {
-        inputSearch.step = [1, 3].includes(idx) ? 1 : 0.01;
-        inputSearch.min = 0;
+        inputSearch.step = [1, 3].includes(idx) ? 1 : 0.01; // Set step for numeric inputs.
+        inputSearch.min = 0; // Set minimum value.
       }
-      inputSearch.placeholder = header;
-      inputSearch.className = "search";
-      inputSearch.addEventListener("input", searchColumn);
-      tdSearch.appendChild(inputSearch);
-      searchRow.appendChild(tdSearch);
+      inputSearch.placeholder = header; // Set placeholder text.
+      inputSearch.className = "search"; // Add search class.
+      inputSearch.id = "search" + label.replace(" ", "").trim() + header.replace(" ", "").trim(); // Set unique ID.
+      inputSearch.name = header; // Set input name.
+      inputSearch.addEventListener("input", searchColumn); // Add input event for filtering.
+      tdSearch.appendChild(inputSearch); // Append input to the cell.
+      searchRow.appendChild(tdSearch); // Append cell to the search row.
     }
   );
 
+  // Create the table body.
   const body = document.createElement("tbody");
   table.appendChild(body);
 
+  // Populate the table rows with artist data.
   Object.entries(stats.artists.details).forEach(([idx, artist]) => {
-    const commissions = Object.entries(stats.commissions.details)[idx][1];
-    const thumbnails = Object.entries(stats.thumbnails.details)[idx][1];
+    const commissions = Object.entries(stats.commissions.details)[idx][1]; // Get commission count.
+    const thumbnails = Object.entries(stats.thumbnails.details)[idx][1]; // Get thumbnail count.
 
+    // Create a row for the artist.
     const row = document.createElement("tr");
-    row.classList = idx % 2 ? "even" : "odd";
+    row.classList = idx % 2 ? "even" : "odd"; // Alternate row classes for styling.
     row.innerHTML = `
             <td>${artist}</td>
             <td>${commissions}</td>
             <td>${calculatePercentage(commissions, totalCommissions)}%</td>
             <td>${thumbnails}</td>
-            <td>${calculatePercentage(thumbnails, commissions)}%</td>`;
-    body.appendChild(row);
+            <td>${calculatePercentage(thumbnails, commissions)}%</td>`; // Populate row cells.
+    body.appendChild(row); // Append row to the table body.
   });
 }
 
+/**
+ * Filters table rows based on the input value in the search column.
+ *
+ * @param {Event} event - The input event triggered by the search field.
+ */
 function searchColumn(event) {
   const td = event.currentTarget.parentElement;
   const col = Array.from(td.parentElement.children).findIndex(function (el) {
@@ -224,6 +262,9 @@ function searchColumn(event) {
   hideRow();
 }
 
+/**
+ * Hides table rows based on the hidden dataset attribute.
+ */
 function hideRow() {
   document.querySelectorAll("table tbody tr").forEach((row) => {
     if (row.dataset.hidden !== undefined) {
@@ -237,6 +278,11 @@ function hideRow() {
   });
 }
 
+/**
+ * Handles click events on table headers for sorting.
+ *
+ * @param {Event} event - The click event triggered by the table header.
+ */
 function clickHeader(event) {
   const table = event.currentTarget.closest("table");
   const tableId = table.id;
@@ -272,6 +318,11 @@ function clickHeader(event) {
   sortTable(table);
 }
 
+/**
+ * Updates sort indicators on table headers based on the current sorting state.
+ *
+ * @param {HTMLTableElement} table - The table element containing the headers.
+ */
 function updateSortIndicators(table) {
   const state = sortStates[table.id];
   const headers = table.querySelectorAll("th");
@@ -286,6 +337,11 @@ function updateSortIndicators(table) {
   });
 }
 
+/**
+ * Sorts table rows based on the current sorting state.
+ *
+ * @param {HTMLTableElement} table - The table element to be sorted.
+ */
 function sortTable(table) {
   const state = sortStates[table.id];
   const tbody = table.querySelector("tbody");
@@ -306,15 +362,15 @@ function sortTable(table) {
           return aValue > bValue ? direction : -direction;
         }
       }
-    }else{
-        const aCell = a.cells[0];
-        const bCell = b.cells[0];
-        const aValue = parseValue(aCell.textContent, true);
-        const bValue = parseValue(bCell.textContent, true);
+    } else {
+      const aCell = a.cells[0];
+      const bCell = b.cells[0];
+      const aValue = parseValue(aCell.textContent, true);
+      const bValue = parseValue(bCell.textContent, true);
 
-        if (aValue !== bValue) {
-          return aValue > bValue ? 1 : -1;
-        }
+      if (aValue !== bValue) {
+        return aValue > bValue ? 1 : -1;
+      }
     }
     return 0;
   });
@@ -324,6 +380,13 @@ function sortTable(table) {
   rows.forEach((row) => tbody.appendChild(row));
 }
 
+/**
+ * Parses the value of a table cell for sorting.
+ *
+ * @param {string} content - The content of the table cell.
+ * @param {boolean} isString - Whether the content is a string.
+ * @returns {number|string} - The parsed value.
+ */
 function parseValue(content, isString) {
   const numericValue = Number(content.replace(/[^0-9.-]/g, ""));
   if (!isNaN(numericValue) && !isString) {

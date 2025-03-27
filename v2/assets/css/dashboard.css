@@ -1,228 +1,246 @@
 /* ======================
    ROOT VARIABLES
    ====================== */
-   :root {
-    /* Theme colors for SFW/NSFW content */
-    --sfw-color: #3c9ada;
-    --nsfw-color: #eb3636;
+/* Define theme colors for SFW (Safe for Work) and NSFW (Not Safe for Work) content */
+:root {
+    --sfw-color: #3c9ada; /* Blue for SFW */
+    --nsfw-color: #eb3636; /* Red for NSFW */
 }
 
 /* ======================
    BASE LAYOUT
    ====================== */
+/* Apply base styles to the HTML and body elements */
 html, body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #2f2f2f;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-flow: row wrap; /* Responsive wrapping */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    font-family: 'Roboto', sans-serif; /* Set font family */
+    background-color: #2f2f2f; /* Set dark background color */
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center content horizontally */
+    align-items: flex-start; /* Align content at the top */
+    flex-flow: row wrap; /* Enable wrapping for responsive design */
 }
 
+/* Style for horizontal rules */
 hr {
-    width: 100%;
-    border: 0;
-    border-top: 1px solid #5f5f5f;
-    margin: 10px 0;
+    width: 100%; /* Full width */
+    border: 0; /* Remove default border */
+    border-top: 1px solid #5f5f5f; /* Add a custom top border */
+    margin: 10px 0; /* Add vertical spacing */
 }
 
 /* ======================
    PANEL COMPONENT
    ====================== */
+/* Style for panel containers */
 .panel {
-    /* Visual styling */
-    background-color: #000;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.9);
-    /* Layout */
-    margin: 20px;
-    padding: 20px;
-    min-width: 250px;
-    max-width: 250px;
-    /* Content handling */
-    overflow-x: hidden;
-    overflow-y: auto;
+    background-color: #000; /* Set black background */
+    border-radius: 5px; /* Add rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.9); /* Add shadow for depth */
+    margin: 20px; /* Add outer spacing */
+    padding: 20px; /* Add inner spacing */
+    min-width: 250px; /* Set minimum width */
+    max-width: 250px; /* Set maximum width */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
-/* Panel title using pseudo-element */
+/* Use the panel's ID as a title via pseudo-element */
 .panel::before {
-    content: attr(id); /* Dynamically uses panel's ID as title */
-    display: table;
-    clear: both;
-    width: 100%;
-    font-size: 20px;
-    font-weight: 300;
-    color: #5f5f5f;
+    content: attr(id); /* Dynamically set content using the panel's ID */
+    display: table; /* Ensure proper layout */
+    clear: both; /* Clear floats */
+    width: 100%; /* Full width */
+    font-size: 20px; /* Set font size */
+    font-weight: 300; /* Use light font weight */
+    color: #5f5f5f; /* Set gray text color */
 }
 
 /* ======================
    COLLAPSIBLE SECTIONS
    ====================== */
+/* Style for collapsible containers inside panels */
 .panel .container {
-    border: 1px solid black;
-    border-left: none;
-    border-right: none;
-    border-collapse: collapse;
+    border: 1px solid black; /* Add black border */
+    border-left: none; /* Remove left border */
+    border-right: none; /* Remove right border */
+    border-collapse: collapse; /* Collapse borders */
 }
 
-/* Checkbox hack for toggle functionality */
+/* Hide checkboxes used for toggle functionality */
 .panel input {
-    display: none;
+    display: none; /* Hide input elements */
 }
 
+/* Hide content by default */
 .panel input ~ .stat-container {
-    display: none;
+    display: none; /* Hide sibling content */
 }
 
+/* Show content when checkbox is checked */
 .panel input:checked ~ .stat-container {
-    display: block;
+    display: block; /* Make sibling content visible */
 }
 
-/* Toggle indicator styling */
+/* Style for toggle indicators */
 .panel input + .stat {
-    cursor: pointer;
-    position: relative;
+    cursor: pointer; /* Change cursor to pointer */
+    position: relative; /* Position for pseudo-element */
 }
 
+/* Add a right arrow as the default toggle indicator */
 .panel input + .stat::after {
-    content: "►";
-    position: absolute;
-    right: 10px;
+    content: "►"; /* Right arrow */
+    position: absolute; /* Position relative to parent */
+    right: 10px; /* Offset from the right */
 }
 
+/* Change to a down arrow when checked */
 .panel input:checked + .stat::after {
-    content: "▼";
+    content: "▼"; /* Down arrow */
 }
 
 /* ======================
    DATA DISPLAY COMPONENTS
    ====================== */
+/* Style for stat headers */
 .stat {
-    display: inline-block;
-    width: 100%;
-    margin: 0 -10px;
-    background-color: #2f2f2f;
-    padding: 10px;
-    color: #f2f2f2;
+    display: inline-block; /* Use inline-block layout */
+    width: 100%; /* Full width */
+    margin: 0 -10px; /* Add negative margin for alignment */
+    background-color: #2f2f2f; /* Set dark background */
+    padding: 10px; /* Add inner spacing */
+    color: #f2f2f2; /* Set light text color */
 }
 
+/* Style for value containers */
 .values {
-    padding: 10px;
-    border: 1px dotted #fff;
-    width: calc(100% - 20px); /* Account for negative margin */
-    margin: 0 -10px 10px;
-    border-radius: 5px;
+    padding: 10px; /* Add inner spacing */
+    border: 1px dotted #fff; /* Add dotted border */
+    width: calc(100% - 20px); /* Adjust width to account for padding */
+    margin: 0 -10px 10px; /* Add negative margin for alignment */
+    border-radius: 5px; /* Add rounded corners */
 }
 
-.values .sfw { color: var(--sfw-color); }
-.values .nsfw { color: var(--nsfw-color); }
+/* SFW and NSFW-specific text colors */
+.values .sfw { color: var(--sfw-color); } /* SFW text color */
+.values .nsfw { color: var(--nsfw-color); } /* NSFW text color */
 
 /* ======================
    PIE CHARTS
    ====================== */
+/* Style for pie chart components */
 .pie-chart {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    margin: 20px;
-    transition: transform 0.3s ease; /* Smooth hover effect */
+    width: 200px; /* Set fixed width */
+    height: 200px; /* Set fixed height */
+    border-radius: 50%; /* Make circular */
+    margin: 20px; /* Add outer spacing */
+    transition: transform 0.3s ease; /* Add smooth hover effect */
     background: conic-gradient(
-        var(--sfw-color) 0% var(--ratio-var),
-        var(--nsfw-color) var(--ratio-var) 100%
+        var(--sfw-color) 0% var(--ratio-var), /* SFW segment */
+        var(--nsfw-color) var(--ratio-var) 100% /* NSFW segment */
     );
 }
 
+/* Scale up the pie chart on hover */
 .pie-chart:hover {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Slightly enlarge */
 }
 
 /* ======================
    TABLE
    ====================== */
-.table-container{
-    overflow-x: auto;
-    overflow-y: visible;
-    max-width: 100vw;
+/* Style for table containers */
+.table-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: visible; /* Allow vertical overflow */
+    max-width: 100vw; /* Limit width to viewport */
 }
 
+/* Style for tables */
 table {
-    /* Visual styling */
-    background-color: #000;
-    color: #5f5f5f;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.9);
-    /* Layout */
-    margin: 20px;
-    padding: 20px;
-    min-width: 250px;
-    max-width: 250px;
-    /* Content handling */
-    overflow-x: hidden;
-    overflow-y: auto;
+    background-color: #000; /* Set black background */
+    color: #5f5f5f; /* Set gray text color */
+    border-radius: 5px; /* Add rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.9); /* Add shadow for depth */
+    margin: 20px; /* Add outer spacing */
+    padding: 20px; /* Add inner spacing */
+    min-width: 250px; /* Set minimum width */
+    max-width: 250px; /* Set maximum width */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
+/* Style for the first row in the table header */
 table thead tr:first-child {
-    background-color: #2f2f2f;
-    color: #f2f2f2;
+    background-color: #2f2f2f; /* Set dark background */
+    color: #f2f2f2; /* Set light text color */
 }
 
 table thead tr:first-child th {
-    padding: 10px;
+    padding: 10px; /* Add inner spacing */
 }
 
+/* Add position attribute to table header cells */
 table thead tr:first-child th[data-position]::before {
-    content: attr(data-position);
-    float: inline-start;
+    content: attr(data-position); /* Display position */
+    float: inline-start; /* Align to start */
 }
 
+/* Add order attribute to table header cells */
 table thead tr:first-child th[data-order]::after {
-    content: attr(data-order);
-    float: inline-end;
+    content: attr(data-order); /* Display order */
+    float: inline-end; /* Align to end */
 }
 
+/* Style for input fields in the last row of the table header */
 table thead tr:last-child td input {
-    padding: 10px;
-    background-color: #000;
-    border-style: unset;
-    color: #f2f2f2;
+    padding: 10px; /* Add inner spacing */
+    background-color: #000; /* Set black background */
+    border-style: unset; /* Remove border style */
+    color: #f2f2f2; /* Set light text color */
 }
 
+/* Style for focused input fields */
 table thead tr:last-child td input:focus-visible {
-    outline: unset;
-    border-bottom: 1px solid #f2f2f2;
+    outline: unset; /* Remove outline */
+    border-bottom: 1px solid #f2f2f2; /* Add bottom border */
 }
 
-table tbody tr[hidden]{
-    display: none;
+/* Hide rows marked as hidden */
+table tbody tr[hidden] {
+    display: none; /* Do not display */
 }
 
-table tbody tr td{
-    color: #f2f2f2;
-    padding: 10px;
-    text-align: right;
+/* Style for table body cells */
+table tbody tr td {
+    color: #f2f2f2; /* Set light text color */
+    padding: 10px; /* Add inner spacing */
+    text-align: right; /* Align text to the right */
 }
 
-table tbody tr td:first-child{
-    color: #f2f2f2;
-    padding: 10px;
-    text-align: left;
+/* Style for the first cell in each row */
+table tbody tr td:first-child {
+    text-align: left; /* Align text to the left */
 }
 
-table tbody tr.odd td{
-    background-color: #2f2f2f;
+/* Style for odd rows */
+table tbody tr.odd td {
+    background-color: #2f2f2f; /* Set dark background */
 }
 
-table tbody tr.even td{
-    background-color: #3f3f3f;
+/* Style for even rows */
+table tbody tr.even td {
+    background-color: #3f3f3f; /* Set slightly lighter background */
 }
 
 /* ======================
    RESPONSIVE DESIGN
    ====================== */
+/* Adjust panel height for larger screens */
 @media (min-width: 650px) {
     .panel {
-        max-height: 760px; /* Allow vertical scrolling on larger screens */
+        max-height: 760px; /* Allow vertical scrolling */
     }
 }
