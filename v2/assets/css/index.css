@@ -209,7 +209,8 @@ main > #gallery .push {
 
 /* Gallery card and preview styling */
 main > #gallery .card, 
-main > #gallery .preview {
+main > #gallery .preview,
+main > #gallery .stat-part {
   text-align: center;
   border-radius: 1rem;
   min-width: 300px;
@@ -245,7 +246,8 @@ main > #gallery .preview .img-div video {
 
 /* Gallery card and preview before pseudo-element styling */
 main > #gallery .card::before,
-main > #gallery .preview::before {
+main > #gallery .preview::before,
+main > #gallery .stat-part::before {
   content: attr(id);
   display: block;
   padding: 0 0.5rem;
@@ -271,6 +273,67 @@ main > #gallery .preview span {
   display: inline-block;
   height: 100%;
   vertical-align: middle;
+}
+
+
+main > #gallery .stat-part {
+  border: 1px solid var(--ce-third-background-color);
+  max-height: none;
+}
+
+main > #gallery #TOTAL.stat-part {
+  max-width: unset;
+  width: 100%;
+}
+
+main > #gallery .stat-part > p {
+  margin: unset;
+  background-color: var(--ce-third-background-color);
+  padding: 0.5rem 0;
+}
+
+main > #gallery .stat-part div {
+  font-size: large;
+}
+
+main > #gallery .stat-part label {
+  cursor: pointer;
+  display: block;
+}
+
+main > #gallery .stat-part > span:not(:first-child) input + label::after {
+  content: "►";
+  padding: 0 0.5rem;
+  font-size: xx-small;
+  vertical-align: middle;
+}
+
+main > #gallery .stat-part ul {
+  display: none;
+  list-style: none;
+  text-align: justify;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 10rem;
+  background-color: var(--ce-primary-background-color);
+}
+
+main > #gallery .stat-part ul li {
+  padding: 0.5rem 0;
+  padding-left: 40px;
+}
+
+main > #gallery .stat-part > span:not(:first-child) input:checked + label::after {
+  content: "▼";
+}
+
+main > #gallery .stat-part input[type="checkbox"]:checked ~ ul {
+  display: block;
+  padding: unset;
+}
+
+main > #gallery .stat-part input {
+  display: none;
 }
 
 /* Responsive styling for smaller screens */
