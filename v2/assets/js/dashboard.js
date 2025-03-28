@@ -211,48 +211,54 @@ function generateTable(stats, label) {
   });
 }
 
+/**
+ * Handles column search input events.
+ * @param {Event} event - Input event from search field.
+ */
 function searchColumn(event) {
-  const td = event.currentTarget.parentElement;
+  const td = event.currentTarget.parentElement; // Get the parent <td> of the input field.
   const col = Array.from(td.parentElement.children).findIndex(function (el) {
-    return el === td;
+    return el === td; // Find the column index of the input field.
   });
-  const searchValue = event.currentTarget.value.trim().toLowerCase();
+  const searchValue = event.currentTarget.value.trim().toLowerCase(); // Normalize the search value.
 
   td.closest("table")
-    .querySelectorAll(`tbody tr`)
+    .querySelectorAll(`tbody tr`) // Select all rows in the table body.
     .forEach((row) => {
       const fieldValue = [0, 1, 2, 5].includes(col)
         ? row
-            .querySelector(`td:nth-child(${col + 1})`)
+            .querySelector(`td:nth-child(${col + 1})`) // Get the cell in the current column.
             .innerText.trim()
             .substring(0, searchValue.length)
-            .toLowerCase()
+            .toLowerCase() // Normalize the cell value.
         : row
             .querySelector(`td:nth-child(${col + 1})`)
             .innerText.trim()
             .toLowerCase();
+
       let colArray;
 
       if (row.dataset.hidden !== undefined) {
-        colArray = JSON.parse(row.dataset.hidden);
+        colArray = JSON.parse(row.dataset.hidden); // Parse the hidden column array if it exists.
       } else {
-        colArray = [];
+        colArray = []; // Initialize an empty array if it doesn't exist.
       }
 
       if (!fieldValue.includes(searchValue) && searchValue !== "") {
-        if (!colArray.includes(col)) colArray.push(col);
+        if (!colArray.includes(col)) colArray.push(col); // Add the column index to the hidden array if it doesn't match.
       } else {
         const index = colArray.indexOf(col);
         if (index > -1) {
-          colArray.splice(index, 1);
+          colArray.splice(index, 1); // Remove the column index if it matches.
         }
       }
 
-      row.dataset.hidden = JSON.stringify(colArray);
+      row.dataset.hidden = JSON.stringify(colArray); // Update the hidden column array in the dataset.
     });
 
-  hideRow();
+  hideRow(); // Hide rows based on the updated hidden column array.
 
+  // Update the search results display.
   if (document.querySelectorAll("table tbody tr[hidden]").length > 0) {
     document.querySelector(".search-results").classList = "search-results filled";
     document.querySelector(".search-results").innerHTML = `Search results: ${
@@ -265,19 +271,26 @@ function searchColumn(event) {
   }
 }
 
+/**
+ * Toggles row visibility based on search filters.
+ */
 function hideRow() {
   document.querySelectorAll("table tbody tr").forEach((row) => {
     if (row.dataset.hidden !== undefined) {
-      const colArray = JSON.parse(row.dataset.hidden);
+      const colArray = JSON.parse(row.dataset.hidden); // Parse the hidden column array.
       if (colArray.length > 0) {
-        row.setAttribute("hidden", "hidden");
+        row.setAttribute("hidden", "hidden"); // Hide the row if the array is not empty.
       } else {
-        row.removeAttribute("hidden");
+        row.removeAttribute("hidden"); // Show the row if the array is empty.
       }
     }
   });
 }
 
+/**
+ * Handles column header clicks for sorting.
+ * @param {Event} event - Click event from header.
+ */
 function clickHeader(event) {
   const table = event.currentTarget.closest("table");
   const tableId = table.id;
@@ -314,6 +327,10 @@ function clickHeader(event) {
   sortTable(table);
 }
 
+/**
+ * Updates visual indicators for sorted columns.
+ * @param {HTMLTableElement} table - Target table to update.
+ */
 function updateSortIndicators(table) {
   const state = sortStates[table.id];
   const headers = table.querySelectorAll("th");
@@ -328,6 +345,10 @@ function updateSortIndicators(table) {
   });
 }
 
+/**
+ * Sorts table rows based on current sortStates.
+ * @param {HTMLTableElement} table - Table to sort.
+ */
 function sortTable(table) {
   const state = sortStates[table.id];
   const tbody = table.querySelector("tbody");
@@ -369,6 +390,12 @@ function sortTable(table) {
   });
 }
 
+/**
+ * Parses cell content for sorting (numeric or string).
+ * @param {string} content - Cell text content.
+ * @param {boolean} isString - Whether to treat as string.
+ * @returns {number|string} - Parsed value for comparison.
+ */
 function parseValue(content, isString) {
   const numericValue = Number(content.replace(/[^0-9.-]/g, ""));
   if (!isNaN(numericValue) && !isString) {

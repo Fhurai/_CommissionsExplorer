@@ -127,11 +127,11 @@ hr {
 
 /* SFW and NSFW-specific text colors */
 .values .sfw {
-  color: var(--sfw-color);
-} /* SFW text color */
+  color: var(--sfw-color); /* SFW text color */
+}
 .values .nsfw {
-  color: var(--nsfw-color);
-} /* NSFW text color */
+  color: var(--nsfw-color); /* NSFW text color */
+}
 
 /* ======================
    PIE CHARTS
@@ -144,8 +144,8 @@ hr {
   margin: 20px; /* Add outer spacing */
   transition: transform 0.3s ease; /* Add smooth hover effect */
   background: conic-gradient(
-    var(--sfw-color) 0% var(--ratio-var),
-    /* SFW segment */ var(--nsfw-color) var(--ratio-var) 100% /* NSFW segment */
+    var(--sfw-color) 0% var(--ratio-var), /* SFW segment */
+    var(--nsfw-color) var(--ratio-var) 100% /* NSFW segment */
   );
 }
 
@@ -158,15 +158,61 @@ hr {
    TABLE
    ====================== */
 
-.table-container{
+/* Style for the table container */
+.table-container {
   margin: 20px; /* Add outer spacing */
 }
 
-.search-results.filled{
-  background-color: #000; /* Set black background */
-  border-radius: 5px; /* Add rounded corners */
-  color: #5f5f5f; /* Set gray text color */
-  padding: 20px 0 0 20px; /* Add inner spacing */
+/* ======================
+   SEARCH RESULTS
+   ====================== */
+/* Style for the search results container when it contains results */
+.search-results.filled {
+  background-color: #000; /* Black background for filled search results */
+  border-radius: 5px; /* Rounded corners */
+  color: #5f5f5f; /* Gray text color */
+  padding: 20px 0 0 20px; /* Inner spacing */
+}
+
+/* ======================
+   TABLE STYLING
+   ====================== */
+/* Style for table cells in the first column */
+table td:first-child,
+table th:first-child {
+  position: sticky; /* Sticky positioning for the first column */
+  left: 0; /* Stick to the left */
+  z-index: 1; /* Ensure it appears above other elements */
+  border-right: 2px solid #000; /* Right border for separation */
+  border-left: 20px solid #000000; /* Left border for alignment */
+}
+
+/* Style for table cells in the last row of the header */
+table thead tr:last-child td input {
+  padding: 10px; /* Inner spacing for input fields */
+  background-color: transparent; /* Transparent background */
+  border-style: unset; /* Remove border style */
+  color: #f2f2f2; /* Light text color */
+  width: 80%; /* Set width to 80% */
+  line-height: 30px; /* Line height for better readability */
+  font-size: 14px; /* Font size for input text */
+}
+
+/* Hide rows marked as hidden */
+table tbody tr[hidden] {
+  display: none; /* Completely hide the row */
+}
+
+/* Style for table body cells */
+table tbody tr td {
+  color: #f2f2f2; /* Light text color */
+  padding: 10px; /* Inner spacing */
+  text-align: right; /* Align text to the right */
+}
+
+/* Style for the first cell in each row */
+table tbody tr td:first-child {
+  text-align: left; /* Align text to the left */
 }
 
 /* Style for tables */
@@ -304,7 +350,7 @@ table tbody tr td.nsfw {
 /* Adjust panel height for larger screens */
 @media (min-width: 650px) {
   table td:nth-child(4),
-  table th:nth-child(4){
+  table th:nth-child(4) {
     max-width: unset; /* Set maximum width for third column */
   }
 }
