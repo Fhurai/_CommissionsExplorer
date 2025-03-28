@@ -1,46 +1,103 @@
-document.addEventListener("DOMContentLoaded", () => getStats());
+// Global variable to store the total number of commissions.
+let totalCommissions = 0;
+let sortStates = {
+  sfw: { order: [], type: "desc" },
+  nsfw: { order: [], type: "desc" },
+};
 
+/**
+ * Main initialization
+ * This event listener waits for the DOM content to be fully loaded before executing the `getStats` function.
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  getStats();
+});
+
+/**
+ * Fetches statistics from the API and generates the UI components.
+ *
+ * This function performs the following steps:
+ * 1. Fetches data from the API endpoint.
+ * 2. Parses the response as JSON.
+ * 3. Calls `generatePanels` to create the main dashboard panels.
+ * 4. Calls `generateArtistsPanel` to create individual artist panels.
+ * 5. Handles errors using `handleError`.
+ * 6. Logs a debug message when the process is complete.
+ */
 function getStats() {
-  fetch("http://naslku.synology.me/Commissions/api/stats.php")
-    .then((res) => res.json())
+  fetch("http://naslku.synology.me/Commissions/api/stats.php") // API endpoint for fetching statistics.
+    .then((res) => res.json()) // Converts the response to JSON format.
     .then((stats) => {
-      generatePanels(stats);
-      document.body.innerHTML += "<hr>";
-      generateArtistsTable(stats);
+      generatePanels(stats); // Generates the main dashboard panels.
+      document.body.innerHTML += "<hr>"; // Adds a horizontal line for separation.
+      generateArtistsTable(stats); // Generates the artists table.
     })
-    .catch((error) => console.error("Failed to check stats:", error.message))
-    .finally(() => console.debug("Stats checked."));
+    .catch(handleError) // Handles any errors during the fetch process.
+    .finally(() => console.debug("Stats checked.")); // Logs a debug message when done.
 }
 
+/**
+ * Error handling utility
+ *
+ * @param {Error} error - The error object containing details about the failure.
+ * Logs the error message to the console.
+ */
+function handleError(error) {
+  console.error("Failed to check stats:", error.message);
+}
+
+/**
+ * Generates all dashboard panels based on the provided statistics.
+ *
+ * @param {object} stats - The statistics object containing SFW and NSFW data.
+ * The `stats` object is expected to have the following structure:
+ * {
+ *   sfw: { artists: { count: number }, commissions: { count: number }, thumbnails: { count: number } },
+ *   nsfw: { artists: { count: number }, commissions: { count: number }, thumbnails: { count: number } }
+ * }
+ */
 function generatePanels(stats) {
+  // Generate the "Total" panel with combined statistics.
   generatePanel({
     id: "Total",
     sections: [
-      createToggleSection("Artistes", stats, "artists"),
-      createToggleSection("Commissions", stats, "commissions"),
-      createImageRatioSection(stats),
+      createToggleSection("Artistes", stats, "artists"), // Toggle section for artists.
+      createToggleSection("Commissions", stats, "commissions"), // Toggle section for commissions.
+      createImageRatioSection(stats), // Image ratio section.
     ],
   });
 
+  // Generate the "SFW" panel with SFW-specific statistics.
   generatePanel({
     id: "SFW",
     sections: [
-      createStatItem("Artistes", stats.sfw.artists.count),
-      createStatItem("Commissions", stats.sfw.commissions.count),
-      createImageSubsection(stats.sfw, "sfw"),
+      createStatItem("Artistes", stats.sfw.artists.count), // SFW artist count.
+      createStatItem("Commissions", stats.sfw.commissions.count), // SFW commission count.
+      createImageSubsection(stats.sfw, "sfw"), // SFW image subsection.
     ],
   });
 
+  // Generate the "NSFW" panel with NSFW-specific statistics.
   generatePanel({
     id: "NSFW",
     sections: [
-      createStatItem("Artistes", stats.nsfw.artists.count),
-      createStatItem("Commissions", stats.nsfw.commissions.count),
-      createImageSubsection(stats.nsfw, "nsfw"),
+      createStatItem("Artistes", stats.nsfw.artists.count), // NSFW artist count.
+      createStatItem("Commissions", stats.nsfw.commissions.count), // NSFW commission count.
+      createImageSubsection(stats.nsfw, "nsfw"), // NSFW image subsection.
     ],
   });
 }
 
+/**
+ * Generic panel generator
+ *
+ * @param {object} config - Configuration object for the panel.
+ * The `config` object should have the following structure:
+ * {
+ *   id: string, // Unique ID for the panel.
+ *   sections: array // Array of HTML elements representing sections within the panel.
+ * }
+ */
 function generatePanel(config) {
   const panel = document.createElement("div");
   panel.className = "panel";
@@ -57,8 +114,10 @@ function generatePanel(config) {
 
 function generateArtistsTable(stats) {
   generateTable(stats.sfw, "sfw");
+
   const hr = document.createElement("hr");
   document.body.appendChild(hr);
+
   generateTable(stats.nsfw, "nsfw");
 }
 
@@ -71,7 +130,6 @@ function generateTable(stats, label) {
   table.className = "table";
   table.id = label;
   container.appendChild(table);
-
   const header = document.createElement("thead");
   table.appendChild(header);
 
@@ -97,8 +155,6 @@ function generateTable(stats, label) {
       }
       inputSearch.placeholder = header;
       inputSearch.className = "search";
-      inputSearch.id = "search" + label.replace(" ", "").trim() + header.replace(" ", "").trim();
-      inputSearch.name = header;
       inputSearch.addEventListener("input", searchColumn);
       tdSearch.appendChild(inputSearch);
       searchRow.appendChild(tdSearch);
@@ -126,7 +182,9 @@ function generateTable(stats, label) {
 
 function searchColumn(event) {
   const td = event.currentTarget.parentElement;
-  const col = Array.from(td.parentElement.children).findIndex((el) => el === td);
+  const col = Array.from(td.parentElement.children).findIndex(function (el) {
+    return el === td;
+  });
   const searchValue = event.currentTarget.value.trim().toLowerCase();
 
   td.closest("table")
@@ -148,7 +206,10 @@ function searchColumn(event) {
         colArray = [];
       }
 
-      if (!fieldValue.includes(searchValue) && searchValue !== "") {
+      if (
+        !fieldValue.includes(searchValue) &&
+        searchValue !== ""
+      ) {
         if (!colArray.includes(col)) colArray.push(col);
       } else {
         const index = colArray.indexOf(col);
@@ -182,24 +243,31 @@ function clickHeader(event) {
   const th = event.currentTarget;
   const colIndex = Array.from(th.parentElement.children).indexOf(th);
 
+  // Update sorting state
   const state = sortStates[tableId];
-  const existingIndex = state.order.findIndex((item) => item.column === colIndex);
+  const existingIndex = state.order.findIndex(
+    (item) => item.column === colIndex
+  );
 
   if (existingIndex === -1) {
+    // New column sorting
     state.order.push({ column: colIndex, direction: "asc" });
     th.dataset.order = "▲";
   } else {
+    // Update existing column sorting
     const currentDirection = state.order[existingIndex].direction;
     if (currentDirection === "asc") {
       state.order[existingIndex].direction = "desc";
       th.dataset.order = "▼";
     } else {
+      // Remove column from sorting
       state.order.splice(existingIndex, 1);
       delete th.dataset.order;
       delete th.dataset.position;
     }
   }
 
+  // Update UI and sort table
   updateSortIndicators(table);
   sortTable(table);
 }
@@ -222,6 +290,7 @@ function sortTable(table) {
   const state = sortStates[table.id];
   const tbody = table.querySelector("tbody");
   const rows = Array.from(tbody.querySelectorAll("tr"));
+  const headers = table.querySelectorAll("th");
 
   rows.sort((a, b) => {
     if (Object.entries(state.order).length > 0) {
@@ -237,19 +306,20 @@ function sortTable(table) {
           return aValue > bValue ? direction : -direction;
         }
       }
-    } else {
-      const aCell = a.cells[0];
-      const bCell = b.cells[0];
-      const aValue = parseValue(aCell.textContent, true);
-      const bValue = parseValue(bCell.textContent, true);
+    }else{
+        const aCell = a.cells[0];
+        const bCell = b.cells[0];
+        const aValue = parseValue(aCell.textContent, true);
+        const bValue = parseValue(bCell.textContent, true);
 
-      if (aValue !== bValue) {
-        return aValue > bValue ? 1 : -1;
-      }
+        if (aValue !== bValue) {
+          return aValue > bValue ? 1 : -1;
+        }
     }
     return 0;
   });
 
+  // Update DOM
   tbody.innerHTML = "";
   rows.forEach((row) => tbody.appendChild(row));
 }
@@ -263,6 +333,14 @@ function parseValue(content, isString) {
   }
 }
 
+/**
+ * Creates toggleable statistic section
+ *
+ * @param {string} label - The label for the section (e.g., "Artistes", "Commissions").
+ * @param {object} stats - The statistics object containing SFW and NSFW data.
+ * @param {string} type - The type of data ("artists" or "commissions").
+ * @returns {HTMLElement} - The generated section element.
+ */
 function createToggleSection(label, stats, type) {
   const total = stats.sfw[type].count + stats.nsfw[type].count;
   if (type === "commissions") totalCommissions = total;
@@ -287,6 +365,13 @@ function createToggleSection(label, stats, type) {
   return section;
 }
 
+/**
+ * Creates image ratio subsection
+ *
+ * @param {object} data - The data object containing statistics for SFW or NSFW.
+ * @param {string} type - The type of data ("sfw" or "nsfw").
+ * @returns {HTMLElement} - The generated subsection element.
+ */
 function createImageSubsection(data, type) {
   const images = data.thumbnails.count;
   const others = data.commissions.count - images;
@@ -314,6 +399,12 @@ function createImageSubsection(data, type) {
   return section;
 }
 
+/**
+ * Creates image ratio section for Total panel
+ *
+ * @param {object} stats - The statistics object containing SFW and NSFW data.
+ * @returns {HTMLElement} - The generated section element.
+ */
 function createImageRatioSection(stats) {
   const totalImages = stats.sfw.thumbnails.count + stats.nsfw.thumbnails.count;
   const totalCommissions =
@@ -342,12 +433,24 @@ function createImageRatioSection(stats) {
   return section;
 }
 
+/**
+ * Utility function to create a container element.
+ *
+ * @returns {HTMLElement} - A div element with the class "container".
+ */
 function createContainer() {
   const container = document.createElement("div");
   container.className = "container";
   return container;
 }
 
+/**
+ * Utility function to create a statistic item.
+ *
+ * @param {string} label - The label for the statistic (e.g., "Artistes").
+ * @param {number} value - The value of the statistic.
+ * @returns {HTMLElement} - A div element representing the statistic.
+ */
 function createStatItem(label, value) {
   const element = document.createElement("div");
   element.className = "stat";
@@ -355,8 +458,16 @@ function createStatItem(label, value) {
   return element;
 }
 
+/**
+ * Calculates the percentage of a numerator relative to a denominator.
+ *
+ * @param {number} numerator - The numerator value.
+ * @param {number} denominator - The denominator value.
+ * @returns {number} - The calculated percentage.
+ * Returns 0 if the denominator is 0 to avoid division by zero.
+ */
 function calculatePercentage(numerator, denominator) {
   return denominator === 0
     ? 0
-    : Math.round((numerator / denominator) * 10000) / 100;
+    : Math.round((numerator / denominator) * 10000) / 100; // Return 0 if denominator is 0, otherwise calculate percentage.
 }
