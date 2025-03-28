@@ -1,8 +1,7 @@
 // Global variable to store the total number of commissions.
 let totalCommissions = 0;
 let sortStates = {
-  sfw: { order: [], type: "desc" },
-  nsfw: { order: [], type: "desc" },
+  artists: { order: [], type: "desc" },
 };
 
 /**
@@ -113,18 +112,42 @@ function generatePanel(config) {
 }
 
 function generateArtistsTable(stats) {
-  generateTable(stats.sfw, "sfw");
+  let artists = {
+    artists: {
+      details: stats.sfw.artists.details.concat(stats.nsfw.artists.details),
+    },
+    commissions: {
+      details: Object.entries(stats.sfw.commissions.details).concat(
+        Object.entries(stats.nsfw.commissions.details)
+      ),
+    },
+    thumbnails: {
+      details: Object.entries(stats.sfw.thumbnails.details).concat(
+        Object.entries(stats.nsfw.thumbnails.details)
+      ),
+    },
+  };
+  artists.artists.details.sort();
+  artists.commissions.details.sort();
+  artists.thumbnails.details.sort();
 
-  const hr = document.createElement("hr");
-  document.body.appendChild(hr);
+  artists.sfw = artists.artists.details
+    .concat(stats.nsfw.artists.details)
+    .map((artist) => {
+      return artist in stats.sfw.commissions.details;
+    });
 
-  generateTable(stats.nsfw, "nsfw");
+  generateTable(artists, "artists");
 }
 
 function generateTable(stats, label) {
   const container = document.createElement("div");
   container.classList = "table-container";
   document.body.appendChild(container);
+
+  const searchResults = document.createElement("div");
+  searchResults.className = "search-results";
+  container.appendChild(searchResults);
 
   const table = document.createElement("table");
   table.className = "table";
@@ -139,41 +162,49 @@ function generateTable(stats, label) {
   const searchRow = document.createElement("tr");
   header.appendChild(searchRow);
 
-  ["Artist", "# Commissions", "% Total", "# Pictures", "Ratio P / C"].forEach(
-    (header, idx) => {
-      const th = document.createElement("th");
-      th.textContent = header;
-      th.addEventListener("click", clickHeader);
-      headerRow.appendChild(th);
+  [
+    "Artist",
+    "? sfw",
+    "% Total",
+    "# Commissions",
+    "# Pictures",
+    "Ratio P / C",
+  ].forEach((header, idx) => {
+    const th = document.createElement("th");
+    th.textContent = header;
+    th.addEventListener("click", clickHeader);
+    headerRow.appendChild(th);
 
-      const tdSearch = document.createElement("td");
-      const inputSearch = document.createElement("input");
-      inputSearch.type = idx === 0 ? "text" : "number";
-      if (idx !== 0) {
-        inputSearch.step = [1, 3].includes(idx) ? 1 : 0.01;
-        inputSearch.min = 0;
-      }
-      inputSearch.placeholder = header;
-      inputSearch.className = "search";
-      inputSearch.addEventListener("input", searchColumn);
-      tdSearch.appendChild(inputSearch);
-      searchRow.appendChild(tdSearch);
+    const tdSearch = document.createElement("td");
+    const inputSearch = document.createElement("input");
+    inputSearch.type = [0, 1].includes(idx) ? "text" : "number";
+    if (![0, 1].includes(idx)) {
+      inputSearch.step = [3, 4].includes(idx) ? 1 : 0.01;
+      inputSearch.min = 0;
     }
-  );
+    inputSearch.placeholder = header;
+    inputSearch.className = "search";
+    inputSearch.addEventListener("input", searchColumn);
+    tdSearch.appendChild(inputSearch);
+    searchRow.appendChild(tdSearch);
+  });
 
   const body = document.createElement("tbody");
   table.appendChild(body);
 
   Object.entries(stats.artists.details).forEach(([idx, artist]) => {
-    const commissions = Object.entries(stats.commissions.details)[idx][1];
-    const thumbnails = Object.entries(stats.thumbnails.details)[idx][1];
+    const commissions = stats.commissions.details[idx][1];
+    const thumbnails = stats.thumbnails.details[idx][1];
 
     const row = document.createElement("tr");
-    row.classList = idx % 2 ? "even" : "odd";
+    row.classList = idx % 2 === 0 ? "even" : "odd"; // Add alternating row classes
     row.innerHTML = `
             <td>${artist}</td>
-            <td>${commissions}</td>
+            <td class='${stats.sfw[idx] ? "sfw" : "nsfw"}'>${
+      stats.sfw[idx] ? "Yes" : "No"
+    }</td>
             <td>${calculatePercentage(commissions, totalCommissions)}%</td>
+            <td>${commissions}</td>
             <td>${thumbnails}</td>
             <td>${calculatePercentage(thumbnails, commissions)}%</td>`;
     body.appendChild(row);
@@ -190,14 +221,16 @@ function searchColumn(event) {
   td.closest("table")
     .querySelectorAll(`tbody tr`)
     .forEach((row) => {
-      const fieldValue = col === 0 ? row
-        .querySelector(`td:nth-child(${col + 1})`)
-        .innerText.trim()
-        .substring(0, searchValue.length)
-        .toLowerCase() : row
-        .querySelector(`td:nth-child(${col + 1})`)
-        .innerText.trim()
-        .toLowerCase();
+      const fieldValue = [0, 1, 2, 5].includes(col)
+        ? row
+            .querySelector(`td:nth-child(${col + 1})`)
+            .innerText.trim()
+            .substring(0, searchValue.length)
+            .toLowerCase()
+        : row
+            .querySelector(`td:nth-child(${col + 1})`)
+            .innerText.trim()
+            .toLowerCase();
       let colArray;
 
       if (row.dataset.hidden !== undefined) {
@@ -206,10 +239,7 @@ function searchColumn(event) {
         colArray = [];
       }
 
-      if (
-        !fieldValue.includes(searchValue) &&
-        searchValue !== ""
-      ) {
+      if (!fieldValue.includes(searchValue) && searchValue !== "") {
         if (!colArray.includes(col)) colArray.push(col);
       } else {
         const index = colArray.indexOf(col);
@@ -222,6 +252,17 @@ function searchColumn(event) {
     });
 
   hideRow();
+
+  if (document.querySelectorAll("table tbody tr[hidden]").length > 0) {
+    document.querySelector(".search-results").classList = "search-results filled";
+    document.querySelector(".search-results").innerHTML = `Search results: ${
+      document.querySelectorAll("table tbody tr").length -
+      document.querySelectorAll("table tbody tr[hidden]").length
+    } results`;
+  } else {
+    document.querySelector(".search-results").classList = "search-results";
+    document.querySelector(".search-results").innerHTML = "";
+  }
 }
 
 function hideRow() {
@@ -252,17 +293,18 @@ function clickHeader(event) {
   if (existingIndex === -1) {
     // New column sorting
     state.order.push({ column: colIndex, direction: "asc" });
-    th.dataset.order = "▲";
+    th.classList.toggle("asc");
   } else {
     // Update existing column sorting
     const currentDirection = state.order[existingIndex].direction;
     if (currentDirection === "asc") {
       state.order[existingIndex].direction = "desc";
-      th.dataset.order = "▼";
+      th.classList.toggle("asc");
+      th.classList.toggle("desc");
     } else {
       // Remove column from sorting
       state.order.splice(existingIndex, 1);
-      delete th.dataset.order;
+      th.classList.toggle("desc");
       delete th.dataset.position;
     }
   }
@@ -299,29 +341,32 @@ function sortTable(table) {
         const direction = sort.direction === "asc" ? 1 : -1;
         const aCell = a.cells[colIndex];
         const bCell = b.cells[colIndex];
-        const aValue = parseValue(aCell.textContent, colIndex === 0);
-        const bValue = parseValue(bCell.textContent, colIndex === 0);
+        const aValue = parseValue(aCell.textContent, [0, 1].includes(colIndex));
+        const bValue = parseValue(bCell.textContent, [0, 1].includes(colIndex));
 
         if (aValue !== bValue) {
           return aValue > bValue ? direction : -direction;
         }
       }
-    }else{
-        const aCell = a.cells[0];
-        const bCell = b.cells[0];
-        const aValue = parseValue(aCell.textContent, true);
-        const bValue = parseValue(bCell.textContent, true);
+    } else {
+      const aCell = a.cells[0];
+      const bCell = b.cells[0];
+      const aValue = parseValue(aCell.textContent, true);
+      const bValue = parseValue(bCell.textContent, true);
 
-        if (aValue !== bValue) {
-          return aValue > bValue ? 1 : -1;
-        }
+      if (aValue !== bValue) {
+        return aValue > bValue ? 1 : -1;
+      }
     }
     return 0;
   });
 
   // Update DOM
   tbody.innerHTML = "";
-  rows.forEach((row) => tbody.appendChild(row));
+  rows.forEach((row, idx) => {
+    row.classList = idx % 2 === 0 ? "even" : "odd"; // Add alternating row classes
+    tbody.appendChild(row);
+  });
 }
 
 function parseValue(content, isString) {
