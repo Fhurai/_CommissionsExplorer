@@ -4,13 +4,15 @@
     <!-- Metadata and title for the dashboard page -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard displaying SFW and NSFW commission statistics.">
     <title>Stats</title>
-    <!-- Link to the external CSS file for styling -->
-    <link rel="stylesheet" href="./assets/css/dashboard.css">
+    <!-- Preload the external CSS file to eliminate render-blocking -->
+    <link rel="preload" href="./assets/css/dashboard.min.css" as="style">
+    <link rel="stylesheet" href="./assets/css/dashboard.min.css">
 </head>
 <body>
     <!-- Body content will go here -->
 </body>
-<!-- Link to the external JavaScript file for functionality -->
-<script src="./assets/js/dashboard.js" defer></script>
+<!-- Defer the external JavaScript file for functionality -->
+<script src="./assets/js/dashboard.min.js" defer></script>
 </html>
