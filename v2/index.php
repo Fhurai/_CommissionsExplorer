@@ -15,6 +15,7 @@
     <title>ComEx - Commission Explorer Application</title>
     
     <!-- Style Sheets -->
+    <link rel="preload" href="./assets/css/index.css" as="style">
     <link rel="stylesheet" href="./assets/css/index.css">
 </head>
 
