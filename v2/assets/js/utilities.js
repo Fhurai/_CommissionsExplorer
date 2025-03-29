@@ -300,7 +300,7 @@ async function progress(action, artist) {
       progressMore.textContent = "";
     }
 
-    console.info(`${artist}: ${percentage}%`);
+    console.debug(`${artist}: ${percentage}%`);
   } catch (err) {
     console.error("Progress update failed:", err.message);
     spinner.classList.remove("loading");
@@ -328,7 +328,7 @@ async function setThumbnails(artist, artworks) {
 
   spinnerNumber.textContent = "0%";
   spinner.classList.add("loading");
-  console.info(`${artist}: 0% - Start`);
+  console.debug(`${artist}: 0% - Start`);
 
   try {
     for (const artwork of artworks) {
@@ -343,7 +343,7 @@ async function setThumbnails(artist, artworks) {
     }
 
     artworks.forEach(artwork => generatePreview(`../${artwork}`));
-    console.info(`${artist}: 100% - End`);
+    console.debug(`${artist}: 100% - End`);
     spinnerNumber.textContent = "100%";
   } catch (error) {
     console.error("Gallery load failed:", error.message);
@@ -369,7 +369,7 @@ function checkNew() {
   fetch(`${host}new.php`)
     .then(res => res.json())
     .then(artists => {
-      if (artists.length > 0) console.info(artists);
+      if (artists.length > 0) console.debug(artists);
     })
     .catch(err => console.log("Failed to check new artists:", err.message))
     .finally(() => {
@@ -540,6 +540,7 @@ function goToArtist(event) {
 
   const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`; // Construct the new URL
   history.pushState(state, title, newUrl); // Push the new state to history
+  window.document.title = title;
   setPageTitle(); // Update the page title
 }
 
@@ -562,6 +563,7 @@ function returnIndex() {
 
   const newUrl = `/Commissions/v2/${page}?${searchParams.toString()}`; // Construct the new URL
   history.pushState(state, title, newUrl); // Push the new state to history
+  window.document.title = title;
   setPageTitle(); // Update the page title
   document.querySelector("#search").value = artist; // Set the search field value to the artist name
 }

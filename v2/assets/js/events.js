@@ -13,33 +13,72 @@ document.addEventListener("DOMContentLoaded", function () {
     
     checkNew();
     addNavigateSuccess(loadContent);
-    addPopState(reloadPage);
+    // addPopState(reloadPage);
     loadContent();
 });
 
 /**
- * Safely adds a navigation success handler to the window's Navigation API.
- * Ensures single instance of the handler by removing existing ones before adding.
- * 
- * @param {Function} f - Event handler function to execute on navigation success. 
- *                       Must be the same function reference for proper deduplication.
- *                       Receives a NavigateEvent object as parameter.
- * 
- * @example
- * addNavigateSuccess((event) => {
- *   console.log('Navigation succeeded to:', event.destination.url);
- * });
- * 
- * @see [Navigation API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API}
- * @see [navigatesuccess event]{@link https://developer.mozilla.org/en-US/docs/Web/API/Navigation/navigatesuccess_event}
+ * Safely adds a navigation success handler, with fallback for unsupported browsers.
+ * Uses History API and custom events to simulate Navigation API behavior.
  */
 function addNavigateSuccess(f) {
-    // First remove existing listener to prevent duplicate handlers
-    window.navigation.removeEventListener("navigatesuccess", f);
-    
-    // Add fresh listener for navigation success events
-    window.navigation.addEventListener("navigatesuccess", f);
-}
+    if (window.navigation) {
+      window.navigation.removeEventListener("navigatesuccess", f);
+      window.navigation.addEventListener("navigatesuccess", f);
+    } else {
+      // Initialize fallback with robust guard
+      if (!window._navigationFallback) {
+        Object.defineProperty(window, "_navigationFallback", {
+          value: {
+            handlers: new Set(),
+            setup() {
+              // Avoid double-patching
+              if (history.pushState._isMonkeyPatched) return;
+  
+              // Patch pushState/replaceState
+              const originalPushState = history.pushState;
+              history.pushState = function(...args) {
+                originalPushState.apply(this, args);
+                window.document.title = args[1];
+                window.dispatchEvent(new CustomEvent("fallbacknavigate", {
+                  detail: { url: window.location.href, state: args[0] }
+                }));
+              };
+              history.pushState._isMonkeyPatched = true;
+  
+              history.replaceState = function(...args) {
+                originalPushState.apply(this, args);
+                window.document.title = args[1];
+                window.dispatchEvent(new CustomEvent("fallbacknavigate", {
+                  detail: { url: window.location.href, state: args[0] }
+                }));
+              };
+              history.replaceState._isMonkeyPatched = true;
+  
+              // Unified event handler
+              const handler = () => {
+                const event = {
+                  destination: { url: window.location.href },
+                  state: history.state
+                };
+                window._navigationFallback.handlers.forEach(cb => cb(event));
+              };
+              window.addEventListener("popstate", handler);
+              window.addEventListener("hashchange", handler);
+              window.addEventListener("fallbacknavigate", handler);
+            }
+          },
+          writable: false,
+          configurable: false
+        });
+        window._navigationFallback.setup();
+      }
+  
+      // Register handler
+      window._navigationFallback.handlers.delete(f);
+      window._navigationFallback.handlers.add(f);
+    }
+  }
 
 /**
  * Safely adds a popstate event listener to the window, ensuring duplicate listeners are removed first.
