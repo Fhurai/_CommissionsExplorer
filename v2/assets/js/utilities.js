@@ -36,7 +36,9 @@ function setPageTitle() {
   const searchParams = new URLSearchParams(window.location.search);
   const artist = searchParams.get("artist");
   document.title = artist ? `${ucFirst(artist)} | ComEx` : "Welcome | ComEx";
-  document.querySelector("meta[name='description']").content = artist ? `Commissions by ${artist}` : `ComEx (Commission Explorer) - Accessible platform for commission management`;
+  document.querySelector("meta[name='description']").content = artist 
+    ? `Commissions by ${artist}` 
+    : `Explore and manage commissions effortlessly with ComEx.`;
 }
 
 /**
