@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="./assets/css/index.css">
 </head>
 
-<body id="root" role="document">    
+<body id="root">    
     <!-- Fallback Content -->
     <noscript>
         <div role="alert" aria-live="polite">

@@ -23,7 +23,7 @@
                 <h3>Artworks</h3>
                 <span>
                     <form action="./artworks.php" method="POST">
-                        <label>Artist name</label>&nbsp;
+                        <label for="artist">Artist name</label>&nbsp;
                         <input id="artist" name="artist" />
                         <input type="submit" value="submit"/>
                     </form>
@@ -34,7 +34,7 @@
                 <h3>Thumbnail</h3>
                 <span>
                     <form action="./thumbnail.php" method="POST">
-                        <label>Artwork path</label>&nbsp;
+                        <label for="artwork">Artwork path</label>&nbsp;
                         <input id="artwork" name="artwork"/>
                         <input type="submit" value="submit"/>
                     </form>
